@@ -1,6 +1,90 @@
 {
   "nodes": {
+    "flake-utils": {
+      "locked": {
+        "lastModified": 1642700792,
+        "narHash": "sha256-XqHrk7hFb+zBvRg6Ghl+AZDq03ov6OshJLiSWOoX5es=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "846b2ae0fc4cc943637d3d1def4454213e203cba",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "lredalize": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1649340101,
+        "narHash": "sha256-iIf7bUBE2SeS/TByUNL9wI1LswlHTmgHYGJltWXNUWE=",
+        "ref": "ot",
+        "rev": "5ae2c3e1ca306e27d81ce5fcc769f62cb7ac42d0",
+        "revCount": 369,
+        "type": "git",
+        "url": "https://github.com/lowRISC/edalize"
+      },
+      "original": {
+        "ref": "ot",
+        "type": "git",
+        "url": "https://github.com/lowRISC/edalize"
+      }
+    },
+    "lrfusesoc": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1633078014,
+        "narHash": "sha256-Q+Q/X/hgpdzrHke2kXaXAsTp+8p1wRJi2pvtOKwd1/Q=",
+        "ref": "ot",
+        "rev": "14dfc825ced58fe1fb343662fa80fc4fbd0fdc50",
+        "revCount": 1335,
+        "type": "git",
+        "url": "https://github.com/lowRISC/fusesoc"
+      },
+      "original": {
+        "ref": "ot",
+        "type": "git",
+        "url": "https://github.com/lowRISC/fusesoc"
+      }
+    },
+    "mach-nix": {
+      "inputs": {
+        "flake-utils": "flake-utils",
+        "nixpkgs": "nixpkgs",
+        "pypi-deps-db": "pypi-deps-db"
+      },
+      "locked": {
+        "lastModified": 1643953409,
+        "narHash": "sha256-CJDg/RpZdUVyI3QIAXUqIoYDl7VkxFtNE4JWih0ucKc=",
+        "owner": "DavHau",
+        "repo": "mach-nix",
+        "rev": "fe5255e6fd8df57e9507b7af82fc59dda9e9ff2b",
+        "type": "github"
+      },
+      "original": {
+        "id": "mach-nix",
+        "ref": "3.4.0",
+        "type": "indirect"
+      }
+    },
     "nixpkgs": {
+      "locked": {
+        "lastModified": 1643805626,
+        "narHash": "sha256-AXLDVMG+UaAGsGSpOtQHPIKB+IZ0KSd9WS77aanGzgc=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "554d2d8aa25b6e583575459c297ec23750adb6cb",
+        "type": "github"
+      },
+      "original": {
+        "id": "nixpkgs",
+        "ref": "nixos-unstable",
+        "type": "indirect"
+      }
+    },
+    "nixpkgs_2": {
       "locked": {
         "lastModified": 1651024496,
         "narHash": "sha256-uKSrrw/neSkxX6TXPSaMyfu7iKzFrK7F6HOt6vQefGY=",
@@ -14,9 +98,28 @@
         "type": "indirect"
       }
     },
+    "pypi-deps-db": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1643877077,
+        "narHash": "sha256-jv8pIvRFTP919GybOxXE5TfOkrjTbdo9QiCO1TD3ZaY=",
+        "owner": "DavHau",
+        "repo": "pypi-deps-db",
+        "rev": "da53397f0b782b0b18deb72ef8e0fb5aa7c98aa3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "DavHau",
+        "repo": "pypi-deps-db",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
-        "nixpkgs": "nixpkgs"
+        "lredalize": "lredalize",
+        "lrfusesoc": "lrfusesoc",
+        "mach-nix": "mach-nix",
+        "nixpkgs": "nixpkgs_2"
       }
     }
   },
