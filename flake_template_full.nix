@@ -1,3 +1,4 @@
+### NOT USED, JUST FOR REFERENCE ###
 {
   description = "A template that shows all standard flake outputs";
 
@@ -5,13 +6,13 @@
   # https://nixos.org/manual/nix/unstable/command-ref/new-cli/nix3-flake.html#flake-inputs
 
   # The flake in the current directory.
-  # inputs.currentDir.url = ".";
+  inputs.currentDir.url = ".";
 
   # A flake in some other directory.
-  # inputs.otherDir.url = "/home/alice/src/patchelf";
+  inputs.otherDir.url = "/home/alice/src/patchelf";
 
   # A flake in some absolute path
-  # inputs.otherDir.url = "path:/home/alice/src/patchelf";
+  inputs.otherDir.url = "path:/home/alice/src/patchelf";
 
   # The nixpkgs entry in the flake registry.
   inputs.nixpkgsRegistry.url = "nixpkgs";

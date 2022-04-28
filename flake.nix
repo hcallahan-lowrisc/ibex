@@ -5,11 +5,11 @@
     mach-nix.url = "mach-nix/3.4.0";
 
     lrfusesoc = {
-     url = "git+https://github.com/lowRISC/fusesoc?ref=ot";
+     url = "github:lowRISC/fusesoc?ref=ot-0.2";
      flake = false;
     };
     lredalize = {
-     url = "git+https://github.com/lowRISC/edalize?ref=ot";
+     url = "github:lowRISC/edalize?ref=ot-0.2";
      flake = false;
     };
   };
@@ -23,27 +23,27 @@
       pyenv = mach-nix.lib.x86_64-linux.mkPython {
         overridesPre = [
           (final: prev: {
-            fusesoc = mach-nix.lib.x86_64-linux.buildPythonPackage {
+            fusesoc = mach-nix.lib.x86_64-linux.buildPythonPackage rec {
               src = lrfusesoc;
-              version = "0.3.3";
-              SETUPTOOLS_SCM_PRETEND_VERSION = "0.3.3";
+              version = "0.3.3.dev";
+              SETUPTOOLS_SCM_PRETEND_VERSION = "${version}";
             };
             edalize = mach-nix.lib.x86_64-linux.buildPythonPackage {
               src = lredalize;
-              version = "0.3.3";
+              version = "0.3.3.dev";
             };
           })
         ];
         requirements = ''
           ##IBEX##
-          fusesoc=0.3.3
-          edalize=0.3.3
+          fusesoc=0.3.3.dev
+          edalize<0.4.3.dev
           pyyaml
           Mako
           junit-xml
           hjson
-          mistletoe # >= 0.7.2
-          premailer # <  3.9.0
+          mistletoe>=0.7.2
+          premailer<3.9.0
 
           ## riscv-dv ##
           bitstring
@@ -69,7 +69,14 @@
     in
       {
 
+        ### from... ibex/examples/simple_system/README.md
+
+        # fusesoc --cores-root=. run --target=sim --setup --build lowrisc:ibex:ibex_simple_system --RV32E=0 --RV32M=ibex_pkg::RV32MFast
+        # make -C examples/sw/simple_system/hello_test
+        # ./build/lowrisc_ibex_ibex_simple_system_0/sim-verilator/Vibex_simple_system [-t] --meminit=ram,./examples/sw/simple_system/hello_test/hello_test.elf
+
         # defaultPackage.x86_64-linux = simple_system;
+        # Construct a shell with all of our dependencies
         devShell.x86_64-linux = pkgs.mkShell {
           name = "simple_system";
           version = "0.1.0";

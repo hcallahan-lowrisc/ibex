@@ -1,9 +1,16 @@
-#!/usr/bin/env python3
 # Copyright lowRISC contributors.
 # Licensed under the Apache License, Version 2.0, see LICENSE for details.
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+import sys
+
+print('\n'.join(sys.path))
+# print( '\n'.join([f'{k}: {v}' for k, v in sorted(os.environ.items())]) )
+
+# Make vendored packages available in the search path.
+sys.path.append(os.path.join(os.path.dirname(__file__), 'vendor'))
+
 import re
 import shutil
 import sys
