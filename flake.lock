@@ -35,18 +35,13 @@
     "lrfusesoc": {
       "flake": false,
       "locked": {
-        "lastModified": 1646915773,
-        "narHash": "sha256-HFrx6vjthNbhrIeV4vNW3YmmqBwqb6lX8lu0dcmQnQM=",
-        "owner": "lowRISC",
-        "repo": "fusesoc",
-        "rev": "c64ca392382b0c432c893d5ce4a93b77af213fdf",
-        "type": "github"
+        "narHash": "sha256-5gDmhQlUAmKDvzy/jCw/WWOaAUagJ6QjBn3qfaaYA6o=",
+        "path": "/home/harrycallahan/projects/fusesoc/",
+        "type": "path"
       },
       "original": {
-        "owner": "lowRISC",
-        "ref": "ot-0.2",
-        "repo": "fusesoc",
-        "type": "github"
+        "path": "/home/harrycallahan/projects/fusesoc/",
+        "type": "path"
       }
     },
     "mach-nix": {
@@ -86,11 +81,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1651024496,
-        "narHash": "sha256-uKSrrw/neSkxX6TXPSaMyfu7iKzFrK7F6HOt6vQefGY=",
+        "lastModified": 1651114127,
+        "narHash": "sha256-/lLC0wkMZkAdA5e1W76SnJzbhfOGDvync3VRHJMtAKk=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "d9e593ed5889f3906dc72811c45bf684be8865cf",
+        "rev": "6766fb6503ae1ebebc2a9704c162b2aef351f921",
         "type": "github"
       },
       "original": {

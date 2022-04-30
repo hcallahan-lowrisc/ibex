@@ -5,11 +5,15 @@
 import os
 import sys
 
-print('\n'.join(sys.path))
-# print( '\n'.join([f'{k}: {v}' for k, v in sorted(os.environ.items())]) )
-
 # Make vendored packages available in the search path.
 sys.path.append(os.path.join(os.path.dirname(__file__), 'vendor'))
+
+import shlex
+import subprocess
+# envcmd = 'env'
+# subprocess.call(shlex.split(envcmd))
+sitecmd = 'python3 -m site'
+subprocess.call(shlex.split(sitecmd))
 
 import re
 import shutil

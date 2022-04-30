@@ -5,7 +5,8 @@
     mach-nix.url = "mach-nix/3.4.0";
 
     lrfusesoc = {
-     url = "github:lowRISC/fusesoc?ref=ot-0.2";
+     url = "path:/home/harrycallahan/projects/fusesoc/";
+     # url = "github:lowRISC/fusesoc?ref=ot-0.2";
      flake = false;
     };
     lredalize = {
@@ -18,25 +19,18 @@
     let
       pkgs = nixpkgs.legacyPackages.x86_64-linux;
 
+      my_fusesoc = pkgs.python3Packages.buildPythonPackage rec {
+        src = lrfusesoc;
+        version = "0.3.3.dev";
+        SETUPTOOLS_SCM_PRETEND_VERSION = "${version}";
+        nativeBuildInputs = with pkgs.python3.pkgs; [ setuptools_scm ];
+        propagatedBuildInputs = with pkgs.python3.pkgs; [ pyparsing pyyaml simplesat ];
+      };
+
       riscv_gcc_toolchain = pkgs.callPackage ./nix/riscv_gcc_lowrisc.nix {};
 
-      pyenv = mach-nix.lib.x86_64-linux.mkPython {
-        overridesPre = [
-          (final: prev: {
-            fusesoc = mach-nix.lib.x86_64-linux.buildPythonPackage rec {
-              src = lrfusesoc;
-              version = "0.3.3.dev";
-              SETUPTOOLS_SCM_PRETEND_VERSION = "${version}";
-            };
-            edalize = mach-nix.lib.x86_64-linux.buildPythonPackage {
-              src = lredalize;
-              version = "0.3.3.dev";
-            };
-          })
-        ];
-        requirements = ''
+      requirements_ibex = ''
           ##IBEX##
-          fusesoc=0.3.3.dev
           edalize<0.4.3.dev
           pyyaml
           Mako
@@ -44,8 +38,8 @@
           hjson
           mistletoe>=0.7.2
           premailer<3.9.0
-
-          ## riscv-dv ##
+      '';
+       requirements_riscvdv = ''
           bitstring
           sphinx
           # pallets-sphinx-themes
@@ -57,9 +51,27 @@
           pyvsc
           tabulate
           pandas
+      '';
 
-          pip
+      fusesoc_deps = mach-nix.lib.x86_64-linux.mkPython {
+        # python = "python310";
+        requirements = requirements_ibex;
+      };
+
+
+      pyenv = mach-nix.lib.x86_64-linux.mkPython {
+        requirements = ''
+          fusesoc=0.3.3.dev
         '';
+        overridesPre = [
+          (final: prev: {
+            fusesoc = my_fusesoc;
+            edalize = mach-nix.lib.x86_64-linux.buildPythonPackage {
+              src = lredalize;
+              version = "0.3.3.dev";
+            };
+          })
+        ];
       };
 
       buildInputs = with pkgs;
@@ -83,6 +95,11 @@
           src = ./.;
           inherit buildInputs;
         };
-
+      #   devShells.x86_64-linux.fusesoc = pkgs.mkShell {
+      #     name = "fusesoc";
+      #     version = "0.1.0";
+      #     buildInputs = [ fusesoc_deps ];
+      #     # inputsFrom = [ my_fusesoc ]; # Use special "inputsFrom" to get the buildInputs from derivations
+      #   };
       };
 }
