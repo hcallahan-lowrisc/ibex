@@ -1,0 +1,261 @@
+
+  File "/usr/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['pkg-config', '--exists', 'riscv-riscv', 'riscv-disasm', 'riscv-fdt']' returned non-zero exit status 1.
+
+The above exception was the direct cause of the following exception:
+
+
+  File "/usr/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['pkg-config', '--exists', 'riscv-riscv', 'riscv-disasm', 'riscv-fdt']' returned non-zero exit status 1.
+
+During handling of the above exception, another exception occurred:
+
+
+/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python39.zip
+/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python3.9
+/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python3.9/lib-dynload
+/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python3.9/site-packages
+/nix/store/l58nxnw8ln5hb70vnsv5qkc7j24fcbcf-python3-3.9.9-env/lib/python3.9/site-packages
+
+
+/home/harrycallahan/projects/ibex/vendor/lowrisc_ip/ip/prim/util
+/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python39.zip
+/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python3.9
+/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python3.9/lib-dynload
+/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python3.9/site-packages
+
+
+
+INFO: Generating lowrisc:prim:prim_pkg-impl:0.1
+DEBUG: /tmp/nix-shell.hXZSg4/lowrisc_prim_prim_pkg-impl_0.1i2_aif74
+DEBUG:     python3 /home/harrycallahan/projects/ibex/vendor/lowrisc_ip/ip/prim/util/primgen.py /tmp/nix-shell.hXZSg4/lowrisc_prim_prim_pkg-impl_0.1i2_aif74/impl_input.yml
+DEBUG: Debugging command... ("python3 -m site")
+---------------------------------------------------------
+sys.path = [
+    '/home/harrycallahan/projects/ibex',
+    '/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python39.zip',
+    '/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python3.9',
+    '/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python3.9/lib-dynload',
+    '/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python3.9/site-packages',
+]
+USER_BASE: '/home/harrycallahan/.local' (exists)
+USER_SITE: '/home/harrycallahan/.local/lib/python3.9/site-packages' (exists)
+ENABLE_USER_SITE: False
+---------------------------------------------------------
+
+
+harrycallahan@harrycallahan-mercury:/tmp/nix-shell.hXZSg4/lowrisc_prim_prim_pkg-impl_0.1i2_aif74$ python3 -m site
+sys.path = [
+    '/tmp/nix-shell.hXZSg4/lowrisc_prim_prim_pkg-impl_0.1i2_aif74',
+    '/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python39.zip',
+    '/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python3.9',
+    '/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python3.9/lib-dynload',
+    '/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python3.9/site-packages',
+    '/nix/store/fprd08p54i0gm23hwn4icyjfwbb8y9p6-python3-3.9.9-env/lib/python3.9/site-packages',
+]
+USER_BASE: '/home/harrycallahan/.local' (exists)
+USER_SITE: '/home/harrycallahan/.local/lib/python3.9/site-packages' (exists)
+ENABLE_USER_SITE: False
+
+#######################
+
+
+
+
+harrycallahan@harrycallahan-mercury:/tmp/nix-shell.Hg3b6o/lowrisc_prim_prim_pkg-impl_0.1dnl993ta$ python3 -c "import sys; print(sys.executable); print(sys.prefix); print(sys.exec_prefix); print(sys.base_prefix); print(sys.base_exec_prefix)"
+/nix/store/9kqzii10wp73yq8a2xpwqbs3i2jvfw93-python3-3.9.9-env/bin/python3.9   # sys.executable
+/nix/store/9kqzii10wp73yq8a2xpwqbs3i2jvfw93-python3-3.9.9-env                 # sys.prefix
+/nix/store/9kqzii10wp73yq8a2xpwqbs3i2jvfw93-python3-3.9.9-env                 # sys.exec_prefix
+/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9                     # sys.base_prefix
+/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9                     # sys.base_exec_prefix
+
+
+INFO: Generating lowrisc:prim:prim_pkg-impl:0.1
+DEBUG: /tmp/nix-shell.Hg3b6o/lowrisc_prim_prim_pkg-impl_0.1dnl993ta
+DEBUG:     python3 /home/harrycallahan/projects/ibex/vendor/lowrisc_ip/ip/prim/util/primgen.py /tmp/nix-shell.Hg3b6o/lowrisc_prim_prim_pkg-impl_0.1dnl993ta/impl_input.yml
+DEBUG: Debugging command...
+/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/bin/python3
+/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9                     # sys.prefix
+/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9                     # sys.exec_prefix
+/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9
+/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9
+
+
+
+######################
+
+harrycallahan@harrycallahan-mercury:/tmp/nix-shell.Hg3b6o/lowrisc_prim_prim_pkg-impl_0.1c0g0yebd$ python3 -m sysconfig
+Platform: "linux-x86_64"
+Python version: "3.9"
+Current installation scheme: "posix_prefix"
+
+Paths: 
+	data        = "/nix/store/9kqzii10wp73yq8a2xpwqbs3i2jvfw93-python3-3.9.9-env"
+	include     = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/include/python3.9"
+	platinclude = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/include/python3.9"
+	platlib     = "/nix/store/9kqzii10wp73yq8a2xpwqbs3i2jvfw93-python3-3.9.9-env/lib/python3.9/site-packages"
+	platstdlib  = "/nix/store/9kqzii10wp73yq8a2xpwqbs3i2jvfw93-python3-3.9.9-env/lib/python3.9"
+	purelib     = "/nix/store/9kqzii10wp73yq8a2xpwqbs3i2jvfw93-python3-3.9.9-env/lib/python3.9/site-packages"
+	scripts     = "/nix/store/9kqzii10wp73yq8a2xpwqbs3i2jvfw93-python3-3.9.9-env/bin"
+	stdlib      = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python3.9"
+
+Variables: 
+(...)
+	abiflags           = ""
+	abs_builddir       = "/no-such-path/Python-3.9.9"
+	abs_srcdir         = "/no-such-path/Python-3.9.9"
+	base               = "/nix/store/9kqzii10wp73yq8a2xpwqbs3i2jvfw93-python3-3.9.9-env"
+	datarootdir        = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/share"
+	exec_prefix        = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9"
+	installed_base     = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9"
+	installed_platbase = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9"
+	platbase           = "/nix/store/9kqzii10wp73yq8a2xpwqbs3i2jvfw93-python3-3.9.9-env"
+	platlibdir         = "lib"
+	prefix             = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9"
+	projectbase        = "/nix/store/9kqzii10wp73yq8a2xpwqbs3i2jvfw93-python3-3.9.9-env/bin"
+	py_version         = "3.9.9"
+	py_version_nodot   = "39"
+	py_version_short   = "3.9"
+	srcdir             = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python3.9/config-3.9-x86_64-linux-gnu"
+	userbase           = "/home/harrycallahan/.local"
+
+######################
+
+INFO: Generating lowrisc:prim:prim_pkg-impl:0.1
+DEBUG: /tmp/nix-shell.KtNZ3y/lowrisc_prim_prim_pkg-impl_0.18tdox1ab
+DEBUG:     python3 /home/harrycallahan/projects/ibex/vendor/lowrisc_ip/ip/prim/util/primgen.py /tmp/nix-shell.KtNZ3y/lowrisc_prim_prim_pkg-impl_0.18tdox1ab/impl_input.yml
+DEBUG: Debugging command...
+Platform: "linux-x86_64"
+Python version: "3.9"
+Current installation scheme: "posix_prefix"
+
+Paths: 
+	data        = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9"
+	include     = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/include/python3.9"
+	platinclude = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/include/python3.9"
+	platlib     = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python3.9/site-packages"
+	platstdlib  = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python3.9"
+	purelib     = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python3.9/site-packages"
+	scripts     = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/bin"
+	stdlib      = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python3.9"
+
+Variables: 
+	abiflags           = ""
+	abs_builddir       = "/no-such-path/Python-3.9.9"
+	abs_srcdir         = "/no-such-path/Python-3.9.9"
+	base               = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9"
+	datarootdir        = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/share"
+	exec_prefix        = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9"
+	installed_base     = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9"
+	installed_platbase = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9"
+	platbase           = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9"
+	platlibdir         = "lib"
+	prefix             = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9"
+	projectbase        = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/bin"
+	py_version         = "3.9.9"
+	py_version_nodot   = "39"
+	py_version_short   = "3.9"
+	srcdir             = "/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9/lib/python3.9/config-3.9-x86_64-linux-gnu"
+	userbase           = "/home/harrycallahan/.local"
+
+
+######################
+
+
+
+$ nix show-derivation /nix/store/bnkq96sgz703iqsasqi6mx7zxblbam95-python3-3.9.9-env
+(...)
+
+"postBuild":
+"
+if [ -L \"$out/bin\" ]; then
+   unlink \"$out/bin\"
+fi
+mkdir -p \"$out/bin\"
+
+for path in
+/nix/store/x24kxyqwqg2ln8kh9ky342kdcmhbng3h-python3-3.9.9
+/nix/store/v9vc01y92w17511avpdrzpn7hq4rd1ri-python3.9-bitstring-3.1.9
+/nix/store/h87ba65czbigysa0zj6fs4lhx9vr36xc-python3.9-edalize-0.3.3
+/nix/store/x3i1lmw9nx9p4fss3648nk2hm05zrz7c-python3.9-flake8-4.0.1
+/nix/store/mna47pc94pkc6fj6jdnls2qrlsmrnlmk-python3.9-fusesoc-0.3.3.dev0
+/nix/store/2qkxafrgsg6dlssbc563l1s3jfj653cn-python3.9-hjson-3.0.2
+/nix/store/6wvgl88gczwf1ldk1igmg8h2rs7r6gpz-python3.9-junit-xml-1.9
+/nix/store/4f6plv8fca49f9vc26wwy76rmpibbk1j-python3.9-mako-1.1.6
+/nix/store/kfs335vbj7zvlxnfrh3xybrzn8zqg991-python3.9-mistletoe-0.8.1
+/nix/store/d4sncv485cc1kvrg05ajvm4wnfgr41xg-python3.9-pandas-1.4.0
+/nix/store/x74p4bh3ayxsk3k82a8dkbgjsgklps5q-python3.9-pip-21.3.1
+/nix/store/pp1q7kg4lvdcam50aya7ry6lv060m1g4-python3.9-premailer-3.7.0
+/nix/store/90gqk4217ndmnpi6b9f8nm9w5qz03h7a-python3.9-pyvsc-0.6.6.1656570787
+/nix/store/yrl7zwgcy6py9m65a3pc6w200ixx4x37-python3.9-pyyaml-6.0
+/nix/store/8j8fnr2sap8xdh9y0n2v89i7q93wg12m-python3.9-sphinx-4.4.0
+/nix/store/dhli3f37xawf1iqyri9sg9rwnny2m7ch-python3.9-tabulate-0.8.9
+/nix/store/4y1rcyzn1ckbpl11j916zs2g298sacic-python3.9-jinja2-3.0.3
+/nix/store/gia2bdhcnymmpmcbi50srmb3a8r9343a-python3.9-markupsafe-2.0.1
+/nix/store/304ymxmf84mw63ypvqxy2iq5305rsp5l-python3.9-mccabe-0.6.1
+/nix/store/d27yi9j5dlqcx0v1njrv0jy2qg51xwzy-python3.9-pycodestyle-2.8.0
+/nix/store/8zjvx0fizww5d08blcjh7kdmddcdic6w-python3.9-pyflakes-2.4.0
+/nix/store/fb0bxikm3hzlb0vy1l6iim2mvzhidcgz-python3.9-pyparsing-3.0.7
+/nix/store/igdw1m6wkd4addkcngpq6h3rdvmpg9pn-python3.9-setuptools-scm-6.4.2
+/nix/store/17rigb0wml0q0z7k2ilcah3q5z4jpj7w-python3.9-simplesat-0.8.2
+/nix/store/17xam522g59mfyvd2zjxv0ga7w2wg5nc-python3.9-packaging-21.3
+/nix/store/waajzd5qbm568x252mfc3m56nf4wjw7x-python3.9-setuptools-57.2.0
+/nix/store/mpzzlpmybcz1lgkl74q85bpk99789bbf-python3.9-tomli-2.0.0
+/nix/store/z0c1nnqgfi06fixq7pjdnybsnpxkj07q-python3.9-attrs-21.4.0
+/nix/store/b3vls8m7vpr2z6q3w2cywafh2jlvcz87-python3.9-okonomiyaki-1.3.2
+/nix/store/spipyva41gjyy68i7d7piwzhab84klwn-python3.9-six-1.16.0
+/nix/store/zb2zfqv97cv2dkjy7m0v6wbq2j6mjfjk-python3.9-distro-1.6.0
+/nix/store/4pvh3hy0v1z2ijpn8lapzjgl7xjx3rk4-python3.9-jsonschema-4.4.0
+/nix/store/15yyk859g0bwwdgjq1p1bzg1hlaa7kaq-python3.9-zipfile2-0.0.12
+/nix/store/vy6q9vz8hy3mpiizrf9m99zdbpg4vi25-python3.9-pyrsistent-0.18.1
+/nix/store/lxjwwkv7kg99mmm6l6mrlj5np1b59dsy-python3.9-numpy-1.22.1
+/nix/store/wx2b6slnqgpp9hfpw51lcksm4r6g60w3-python3.9-python-dateutil-2.8.2
+/nix/store/w1cnym57ncwl0bj5cj7iad3mc32xpip5-python3.9-pytz-2021.3
+/nix/store/wrx856sqq7q3xf0ym3kyxs5v46kzi7j3-python3.9-cachetools-5.0.0
+/nix/store/cn5fl4dszp19sykqds5dz3g8aar68l13-python3.9-cssselect-1.1.0
+/nix/store/y63qafliq1mbrbdb25s30v1cm08dpgq7-python3.9-cssutils-2.3.0
+/nix/store/v06b7ggl4i3ic5sjd56l42ggr9sx1qrc-python3.9-lxml-4.7.1
+/nix/store/gd0j7n76yhgmm5w0llib6q3qv59na87j-python3.9-requests-2.27.1
+/nix/store/nn568x8zp5v657by7qwf6q9xxwszbblf-python3.9-certifi-2021.10.8
+/nix/store/f6n9gvhp3825lqzlhjv8ypq3nbnkrph0-python3.9-charset-normalizer-2.0.11
+/nix/store/fkxzy93shia2c0b7c6f4d8qacz0pql83-python3.9-idna-3.3
+/nix/store/3vb5yh23k92v0j3a9rvmijs1xhsrmj7q-python3.9-urllib3-1.26.8
+/nix/store/glg2fzm5k75cyc8wj5xcv2h9n9sjhfcf-python3.9-pyboolector-3.2.2.20220125.14
+/nix/store/izsd9y47vpgxym4pysrb2zm56nh7bffc-python3.9-pyucis-0.0.5.20211020.1
+/nix/store/6aw9bzn2zqmr7cf69s8lybha3zcjlr3n-python3.9-toposort-1.7
+/nix/store/rcinxpgj4g939220s55yvj9qkcrx6n2f-python3.9-alabaster-0.7.12
+/nix/store/2dz5wv33smihcm2xm0pfk3m5nz4hbkzw-python3.9-babel-2.9.1
+/nix/store/q5vnld1gj57sq5y7414qcch0va5yka44-python3.9-docutils-0.17.1
+/nix/store/0yki5jzqb8ah9kibv62r1wyw9zbi7908-python3.9-imagesize-1.3.0
+/nix/store/73q5p7j8scp51ijxnz86bg5hgi58f66x-python3.9-importlib-metadata-4.10.1
+/nix/store/3232mz80rjgvxx094z4s0qw22jliqqmp-python3.9-pygments-2.11.2
+/nix/store/fbrlhkxwflwhl6dvmd7mym85jw1r6013-python3.9-snowballstemmer-2.2.0
+/nix/store/92qgr34ndh3zmm510422cb1qig7rnfil-python3.9-sphinxcontrib-applehelp-1.0.2
+/nix/store/8p42i6y5ydd2mdscx75ni7r90ymdv9d6-python3.9-sphinxcontrib-devhelp-1.0.2
+/nix/store/05z13r818k9vbji189pn20236pbzmhgk-python3.9-sphinxcontrib-htmlhelp-2.0.0
+/nix/store/p24sgvding68la61z4vwp229vqk3485b-python3.9-sphinxcontrib-jsmath-1.0.1
+/nix/store/az7wq5pyhqfgchdiiyh00varv4nakmp9-python3.9-sphinxcontrib-qthelp-1.0.3
+/nix/store/hhd1gy674zga2scqdi1jk44j2slsvd9r-python3.9-sphinxcontrib-serializinghtml-1.1.5
+/nix/store/j6kgn0iva5j18qa6m22xvjcibr7i239j-python3.9-zipp-3.7.0;
+do
+ if [ -d \"$path/bin\" ]; then
+   cd \"$path/bin\"
+   for prg in *; do
+     if [ -f \"$prg\" ]; then
+       rm -f \"$out/bin/$prg\"
+       if [ -x \"$prg\" ]; then
+         makeWrapper \"$path/bin/$prg\" \"$out/bin/$prg\"
+         --set NIX_PYTHONPREFIX \"$out\"
+         --set NIX_PYTHONEXECUTABLE /1rz4g4znpzjwh1xymhjpm42vipw92pr73vdgl6xs1hycac8kf2n9/bin/python3.9
+         --set NIX_PYTHONPATH /1rz4g4znpzjwh1xymhjpm42vipw92pr73vdgl6xs1hycac8kf2n9/lib/python3.9/site-packages
+         --set PYTHONNOUSERSITE \"true\"
+         --suffix-each PATH \":\" \"\"
+         --set QT_PLUGIN_PATH /nix/store/l9wf9ym578jaibml1q0w13rs40im1ga5-python3-3.9.9-env/plugins
+       fi
+     fi
+   done
+ fi
+done
+",

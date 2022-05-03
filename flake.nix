@@ -3,6 +3,14 @@
 
   inputs = {
     mach-nix.url = "mach-nix/3.4.0";
+    fetchPypi = {
+      url = "git+https://github.com/DavHau/nix-pypi-fetcher";
+    };
+
+    # name = "nix-pypi-fetcher";
+    # url = "https://github.com/DavHau/nix-pypi-fetcher/tarball/${commit}";
+    # # Hash obtained using `nix-prefetch-url --unpack <url>`
+    # sha256 = "1c06574aznhkzvricgy5xbkyfs33kpln7fb41h8ijhib60nharnp";
 
     lrfusesoc = {
      url = "path:/home/harrycallahan/projects/fusesoc/";
@@ -13,11 +21,15 @@
      url = "github:lowRISC/edalize?ref=ot-0.2";
      flake = false;
     };
+    # simplesat = {
+    #   url = ;
+    #   flake = false;
+    # }
   };
 
   outputs = { self, nixpkgs, mach-nix, lrfusesoc, lredalize }:
     let
-      pkgs = nixpkgs.legacyPackages.x86_64-linux;
+      system = "x86_64-linux";
 
       my_fusesoc = pkgs.python3Packages.buildPythonPackage rec {
         src = lrfusesoc;
@@ -27,10 +39,49 @@
         propagatedBuildInputs = with pkgs.python3.pkgs; [ pyparsing pyyaml simplesat ];
       };
 
+      my_edalize = pkgs.python3Packages.buildPythonPackage rec {
+        src = lredalize;
+        version = "0.3.3.dev";
+        SETUPTOOLS_SCM_PRETEND_VERSION = "${version}";
+        propagatedBuildInputs = with pkgs.python3.pkgs; [ jinja2 ];
+        dontTest = true;
+      };
+
+      my_simplesat = pkgs.python3Packages.buildPythonPackage rec {
+        pname = "simplesat";
+        version = "0.8.2";
+        src = pkgs.python3Packages.fetchPypi {
+          inherit pname version;
+          sha256 = "0000000000000000000000000000000000000000000000000000";
+        };
+        propagatedBuildInputs = with pkgs.python3.pkgs; [ attrs okonomiyaki six ];
+      };
+
+      my_overlay = final: prev: {
+        python3 = prev.python3.override {
+          packageOverrides = pfinal: pprev: {
+            fusesoc = my_fusesoc;
+            edalize = my_edalize;
+            simplesat = my_simplesat;
+          };
+        };
+      };
+
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [ my_overlay ];
+      };
+
+      my_env = pkgs.python3.withPackages(
+        p: with p; [ fusesoc edalize ]
+      );
+
+
       riscv_gcc_toolchain = pkgs.callPackage ./nix/riscv_gcc_lowrisc.nix {};
 
       requirements_ibex = ''
           ##IBEX##
+          fusesoc<0.4.3.dev
           edalize<0.4.3.dev
           pyyaml
           Mako
@@ -42,41 +93,32 @@
        requirements_riscvdv = ''
           bitstring
           sphinx
-          # pallets-sphinx-themes
-          # sphinxcontrib-log-cabinet
-          # sphinx-issues
-          # sphinx_rtd_theme
-          # rst2pdf
+          pallets-sphinx-themes
+          sphinxcontrib-log-cabinet
+          sphinx-issues
+          sphinx_rtd_theme
+          rst2pdf
           flake8
           pyvsc
           tabulate
           pandas
       '';
 
-      fusesoc_deps = mach-nix.lib.x86_64-linux.mkPython {
-        # python = "python310";
-        requirements = requirements_ibex;
-      };
-
-
-      pyenv = mach-nix.lib.x86_64-linux.mkPython {
-        requirements = ''
-          fusesoc=0.3.3.dev
-        '';
-        overridesPre = [
-          (final: prev: {
-            fusesoc = my_fusesoc;
-            edalize = mach-nix.lib.x86_64-linux.buildPythonPackage {
-              src = lredalize;
-              version = "0.3.3.dev";
-            };
-          })
-        ];
-      };
+      # pyenv = mach-nix.lib.x86_64-linux.mkPython {
+      #   requirements = ''
+      #     fusesoc=0.3.3.dev
+      #   '';
+      #   overridesPre = [
+      #     (final: prev: {
+      #       fusesoc = my_fusesoc;
+      #       edalize = my_edalize;
+      #     })
+      #   ];
+      # };
 
       buildInputs = with pkgs;
         [ verilator libelf srecord ] ++
-        [ riscv_gcc_toolchain pyenv ];
+        [ riscv_gcc_toolchain my_env ];
 
     in
       {
