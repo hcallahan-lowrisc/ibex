@@ -135,7 +135,7 @@
           name = "simple_system";
           version = "0.1.0";
           src = ./.;
-          inherit buildInputs;
+          inputsFrom = buildInputs;
         };
       #   devShells.x86_64-linux.fusesoc = pkgs.mkShell {
       #     name = "fusesoc";
