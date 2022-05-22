@@ -3,9 +3,10 @@
 
   inputs = {
     mach-nix.url = "mach-nix/3.4.0";
-    fetchPypi = {
-      url = "git+https://github.com/DavHau/nix-pypi-fetcher";
-    };
+
+    # fetchPypi = {
+    #   url = "git+https://github.com/DavHau/nix-pypi-fetcher";
+    # };
 
     # name = "nix-pypi-fetcher";
     # url = "https://github.com/DavHau/nix-pypi-fetcher/tarball/${commit}";
@@ -13,18 +14,14 @@
     # sha256 = "1c06574aznhkzvricgy5xbkyfs33kpln7fb41h8ijhib60nharnp";
 
     lrfusesoc = {
-     url = "path:/home/harrycallahan/projects/fusesoc/";
-     # url = "github:lowRISC/fusesoc?ref=ot-0.2";
+     # url = "path:/home/harrycallahan/projects/fusesoc/";
+     url = "github:lowRISC/fusesoc?ref=ot-0.2";
      flake = false;
     };
     lredalize = {
      url = "github:lowRISC/edalize?ref=ot-0.2";
      flake = false;
     };
-    # simplesat = {
-    #   url = ;
-    #   flake = false;
-    # }
   };
 
   outputs = { self, nixpkgs, mach-nix, lrfusesoc, lredalize }:
@@ -54,7 +51,18 @@
           inherit pname version;
           sha256 = "0000000000000000000000000000000000000000000000000000";
         };
-        propagatedBuildInputs = with pkgs.python3.pkgs; [ attrs okonomiyaki six ];
+        propagatedBuildInputs = with pkgs.python3.pkgs; [ attrs six ] ++
+                                                        [ my_okonomiyaki ];
+      };
+
+      my_okonomiyaki = pkgs.python3Packages.buildPythonPackage rec {
+        pname = "okonomiyaki";
+        version = "1.3.2";
+        src = pkgs.python3Packages.fetchPypi {
+          inherit pname version;
+          sha256 = "0000000000000000000000000000000000000000000000000000";
+        };
+        # propagatedBuildInputs = with pkgs.python3.pkgs; [ attrs okonomiyaki six ];
       };
 
       my_overlay = final: prev: {
@@ -72,12 +80,10 @@
         overlays = [ my_overlay ];
       };
 
-      my_env = pkgs.python3.withPackages(
+      my_python_env = pkgs.python3.withPackages(
         p: with p; [ fusesoc edalize ]
       );
 
-
-      riscv_gcc_toolchain = pkgs.callPackage ./nix/riscv_gcc_lowrisc.nix {};
 
       requirements_ibex = ''
           ##IBEX##
@@ -116,9 +122,11 @@
       #   ];
       # };
 
-      buildInputs = with pkgs;
+      riscv_gcc_toolchain = pkgs.callPackage ./nix/riscv_gcc_lowrisc.nix {};
+
+      myBuildInputs = with pkgs;
         [ verilator libelf srecord ] ++
-        [ riscv_gcc_toolchain my_env ];
+        [ riscv_gcc_toolchain my_python_env ];
 
     in
       {
@@ -132,10 +140,12 @@
         # defaultPackage.x86_64-linux = simple_system;
         # Construct a shell with all of our dependencies
         devShell.x86_64-linux = pkgs.mkShell {
-          name = "simple_system";
+          pname = "simple_system";
+          name = "ss";
           version = "0.1.0";
           src = ./.;
-          inputsFrom = buildInputs;
+          buildInputs = myBuildInputs;
+          # inputsFrom = myBuildInputs;
         };
       #   devShells.x86_64-linux.fusesoc = pkgs.mkShell {
       #     name = "fusesoc";
