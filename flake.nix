@@ -2,156 +2,133 @@
   description = "Build and run Ibex Simple_System simulation declaratively using Nix!";
 
   inputs = {
-    mach-nix.url = "mach-nix/3.4.0";
-
-    # fetchPypi = {
-    #   url = "git+https://github.com/DavHau/nix-pypi-fetcher";
-    # };
-
-    # name = "nix-pypi-fetcher";
-    # url = "https://github.com/DavHau/nix-pypi-fetcher/tarball/${commit}";
-    # # Hash obtained using `nix-prefetch-url --unpack <url>`
-    # sha256 = "1c06574aznhkzvricgy5xbkyfs33kpln7fb41h8ijhib60nharnp";
-
-    lrfusesoc = {
-     # url = "path:/home/harrycallahan/projects/fusesoc/";
-     url = "github:lowRISC/fusesoc?ref=ot-0.2";
-     flake = false;
+    mach-nix = {
+      url = "mach-nix/3.4.0";
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
-    lredalize = {
-     url = "github:lowRISC/edalize?ref=ot-0.2";
-     flake = false;
+    deps = {
+      url = "path:/home/harry/projects/ibex_flake/dependencies";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
+    flake-utils.url = "github:numtide/flake-utils";
+    devshell.url = "github:numtide/devshell";
+
   };
 
-  outputs = { self, nixpkgs, mach-nix, lrfusesoc, lredalize }:
+  outputs = { self, nixpkgs,
+              mach-nix, flake-utils, devshell,
+              deps, ...}:
     let
       system = "x86_64-linux";
 
-      my_fusesoc = pkgs.python3Packages.buildPythonPackage rec {
-        src = lrfusesoc;
-        version = "0.3.3.dev";
-        SETUPTOOLS_SCM_PRETEND_VERSION = "${version}";
-        nativeBuildInputs = with pkgs.python3.pkgs; [ setuptools_scm ];
-        propagatedBuildInputs = with pkgs.python3.pkgs; [ pyparsing pyyaml simplesat ];
+      riscv_gcc_toolchain = pkgs.callPackage ./nix/riscv_gcc_lowrisc.nix {};
+
+      # The upstream nixpkgs.verilator does not include zlib as a run-time dependency
+      # It is needed in some use-cases (eg. FST) when building against verilator headers
+      verilator_overlay = final: prev: {
+        verilator = prev.verilator.overrideAttrs ( oldAttrs : {
+          propagatedBuildInputs = [ final.zlib ];
+        });
       };
 
-      my_edalize = pkgs.python3Packages.buildPythonPackage rec {
-        src = lredalize;
-        version = "0.3.3.dev";
-        SETUPTOOLS_SCM_PRETEND_VERSION = "${version}";
-        propagatedBuildInputs = with pkgs.python3.pkgs; [ jinja2 ];
-        dontTest = true;
-      };
-
-      my_simplesat = pkgs.python3Packages.buildPythonPackage rec {
-        pname = "simplesat";
-        version = "0.8.2";
-        src = pkgs.python3Packages.fetchPypi {
-          inherit pname version;
-          sha256 = "0000000000000000000000000000000000000000000000000000";
-        };
-        propagatedBuildInputs = with pkgs.python3.pkgs; [ attrs six ] ++
-                                                        [ my_okonomiyaki ];
-      };
-
-      my_okonomiyaki = pkgs.python3Packages.buildPythonPackage rec {
-        pname = "okonomiyaki";
-        version = "1.3.2";
-        src = pkgs.python3Packages.fetchPypi {
-          inherit pname version;
-          sha256 = "0000000000000000000000000000000000000000000000000000";
-        };
-        # propagatedBuildInputs = with pkgs.python3.pkgs; [ attrs okonomiyaki six ];
-      };
-
-      my_overlay = final: prev: {
-        python3 = prev.python3.override {
-          packageOverrides = pfinal: pprev: {
-            fusesoc = my_fusesoc;
-            edalize = my_edalize;
-            simplesat = my_simplesat;
-          };
-        };
+      my_python_env = pkgs.python3.buildEnv.override {
+        extraLibs = with pkgs.python3.pkgs; [
+          fusesoc edalize
+          pyyaml Mako junit-xml hjson mistletoe premailer
+          anytree pip ];
       };
 
       pkgs = import nixpkgs {
         inherit system;
-        overlays = [ my_overlay ];
+        overlays = [
+          devshell.overlay
+          deps.overlay_pkgs
+          (final: prev: {
+            python3 = prev.python3.override {
+              packageOverrides = deps.overlay_python;
+            };
+          })
+          verilator_overlay
+        ];
       };
 
-      my_python_env = pkgs.python3.withPackages(
-        p: with p; [ fusesoc edalize ]
-      );
-
-
-      requirements_ibex = ''
-          ##IBEX##
-          fusesoc<0.4.3.dev
-          edalize<0.4.3.dev
-          pyyaml
-          Mako
-          junit-xml
-          hjson
-          mistletoe>=0.7.2
-          premailer<3.9.0
-      '';
-       requirements_riscvdv = ''
-          bitstring
-          sphinx
-          pallets-sphinx-themes
-          sphinxcontrib-log-cabinet
-          sphinx-issues
-          sphinx_rtd_theme
-          rst2pdf
-          flake8
-          pyvsc
-          tabulate
-          pandas
-      '';
-
-      # pyenv = mach-nix.lib.x86_64-linux.mkPython {
-      #   requirements = ''
-      #     fusesoc=0.3.3.dev
-      #   '';
-      #   overridesPre = [
-      #     (final: prev: {
-      #       fusesoc = my_fusesoc;
-      #       edalize = my_edalize;
-      #     })
-      #   ];
-      # };
-
-      riscv_gcc_toolchain = pkgs.callPackage ./nix/riscv_gcc_lowrisc.nix {};
-
-      myBuildInputs = with pkgs;
-        [ verilator libelf srecord ] ++
+      my_build_inputs =
+        (with pkgs; [ libelf srecord verilator ]) ++
         [ riscv_gcc_toolchain my_python_env ];
+
+      # requirements_ibex = ''
+      #     ##IBEX##
+      #     # These two packages are added at a later stage
+      #     fusesoc
+      #     edalize
+      #     pyyaml
+      #     Mako
+      #     junit-xml
+      #     hjson
+      #     mistletoe>=0.7.2
+      #     premailer<3.9.0
+      # '';
+      #  requirements_riscvdv = ''
+      #     bitstring
+      #     sphinx
+      #     pallets-sphinx-themes
+      #     sphinxcontrib-log-cabinet
+      #     sphinx-issues
+      #     sphinx_rtd_theme
+      #     rst2pdf
+      #     flake8
+      #     pyvsc
+      #     tabulate
+      #     pandas
+      # '';
+
+      # Not currently used - though I still think mach-nix may be a better way to do this...
+      # pyenv = mach-nix.lib.x86_64-linux.mkPython {
+      #   ignoreDataOutdated = true;
+      #   requirements = requirements_ibex;
+      #   # requirements = requirements_ibex + requirements_riscvdv;
+      #   overridesPre = [ deps.overlay_python ];
+      #   # packagesExtra = [];
+      # };
 
     in
       {
+        packages.x86_64-linux.default = pkgs.stdenv.mkDerivation {
+          pname = "simple_system";
+          name = "ss";
+          version = "0.1.0";
+          src = pkgs.lib.cleanSource ./.;
+          packages = my_build_inputs;
 
-        ### from... ibex/examples/simple_system/README.md
+          installPhase = ''
+          mkdir -p $out
+          cp -r * $out
+          '';
+        };
 
-        # fusesoc --cores-root=. run --target=sim --setup --build lowrisc:ibex:ibex_simple_system --RV32E=0 --RV32M=ibex_pkg::RV32MFast
-        # make -C examples/sw/simple_system/hello_test
-        # ./build/lowrisc_ibex_ibex_simple_system_0/sim-verilator/Vibex_simple_system [-t] --meminit=ram,./examples/sw/simple_system/hello_test/hello_test.elf
-
-        # defaultPackage.x86_64-linux = simple_system;
-        # Construct a shell with all of our dependencies
+        # Construct a devShell with all of our dependencies (stdenv.mkShell)
         devShell.x86_64-linux = pkgs.mkShell {
           pname = "simple_system";
           name = "ss";
           version = "0.1.0";
-          src = ./.;
-          buildInputs = myBuildInputs;
-          # inputsFrom = myBuildInputs;
+          src = pkgs.lib.cleanSource ./.;
+          packages = my_build_inputs;
         };
-      #   devShells.x86_64-linux.fusesoc = pkgs.mkShell {
-      #     name = "fusesoc";
-      #     version = "0.1.0";
-      #     buildInputs = [ fusesoc_deps ];
-      #     # inputsFrom = [ my_fusesoc ]; # Use special "inputsFrom" to get the buildInputs from derivations
-      #   };
+
+        # Construct a devShell with all of our dependencies (numtide/devshell)
+        # devShell.x86_64-linux = pkgs.devshell.mkShell {
+        #   # pname = "simple_system";
+        #   name = "ibex_simple_system";
+        #   # version = "0.1.0";
+        #   # src = pkgs.lib.cleanSource ./.;
+        #   packages = my_build_inputs;
+        #   # inputsFrom = my_build_inputs;
+        # };
+
+        # Invoke the devshell with "nix develop -i"
+        # And then run.... (from ### ibex/examples/simple_system/README.md ###)
+        # fusesoc --cores-root=. run --target=sim --setup --build lowrisc:ibex:ibex_simple_system --RV32E=0 --RV32M=ibex_pkg::RV32MFast
+        # make -C /home/harry/projects/ibex/examples/sw/benchmarks/coremark/
+        # build/lowrisc_ibex_ibex_simple_system_0/sim-verilator/Vibex_simple_system --meminit=ram,examples/sw/benchmarks/coremark/coremark.elf
       };
 }
