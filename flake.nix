@@ -116,14 +116,14 @@
         };
 
         # Construct a devShell with all of our dependencies (numtide/devshell)
-        # devShell.x86_64-linux = pkgs.devshell.mkShell {
-        #   # pname = "simple_system";
-        #   name = "ibex_simple_system";
-        #   # version = "0.1.0";
-        #   # src = pkgs.lib.cleanSource ./.;
-        #   packages = my_build_inputs;
-        #   # inputsFrom = my_build_inputs;
-        # };
+        devShells.x86_64-linux.numtidedevshell = pkgs.devshell.mkShell {
+          # pname = "simple_system";
+          name = "ibex_simple_system";
+          # version = "0.1.0";
+          # src = pkgs.lib.cleanSource ./.;
+          packages = my_build_inputs;
+          # inputsFrom = my_build_inputs;
+        };
 
         # Invoke the devshell with "nix develop -i"
         # And then run.... (from ### ibex/examples/simple_system/README.md ###)
