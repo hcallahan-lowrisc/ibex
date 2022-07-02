@@ -106,6 +106,15 @@
           '';
         };
 
+        packages.x86_64-linux.dockerImage = pkgs.dockerTools.buildImage {
+          name = "simple_system_docker";
+          tag = "latest";
+          contents = [ pkgs.coreutils my_build_inputs ];
+          config.Cmd = [
+            "${pkgs.bash}/bin/bash"
+          ];
+        };
+
         # Construct a devShell with all of our dependencies (stdenv.mkShell)
         devShell.x86_64-linux = pkgs.mkShell {
           pname = "simple_system";
