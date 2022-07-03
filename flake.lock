@@ -9,8 +9,8 @@
         ]
       },
       "locked": {
-        "lastModified": 1656850838,
-        "narHash": "sha256-jr3mJzhp8JMMeR8NdeRPNwyXyKaflUsRaWqrfGt1JW8=",
+        "lastModified": 1656852950,
+        "narHash": "sha256-YbtonexM43/xlHOWNc3t+15SoTJE2lW0XsRJdhBHyuw=",
         "path": "/home/harry/projects/ibex_flake/dependencies",
         "type": "path"
       },

@@ -21,8 +21,6 @@
     let
       system = "x86_64-linux";
 
-      lowrisc_riscv_gcc_toolchain = pkgs.callPackage ./nix/riscv_gcc_lowrisc.nix {};
-
       # The upstream nixpkgs.verilator does not include zlib as a run-time dependency
       # It is needed in some use-cases (eg. FST) when building against verilator headers
       verilator_overlay = final: prev: {
@@ -53,8 +51,8 @@
       };
 
       my_build_inputs =
-        (with pkgs; [ pkg-config libelf srecord verilator riscv-isa-sim ]) ++
-        [ lowrisc_riscv_gcc_toolchain my_python_env ];
+        (with pkgs; [ pkg-config libelf srecord verilator riscv-isa-sim riscv-gcc-toolchain-lowrisc ]) ++
+        [ my_python_env ];
 
       ibex_ss = pkgs.stdenv.mkDerivation {
         pname = "simple_system";
