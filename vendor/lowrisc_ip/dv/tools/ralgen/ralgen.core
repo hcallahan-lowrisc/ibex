@@ -7,5 +7,5 @@ name: "lowrisc:dv:ralgen"
 description: "Generator for UVM RAL package used in DV testbenches."
 generators:
   ralgen:
-    interpreter: /nix/store/v6zfj35nbc6964nbgg73355adpnmy78s-python3-3.10.4-env/bin/python3
+    interpreter: python3
     command: ralgen.py

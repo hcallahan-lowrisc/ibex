@@ -6,5 +6,5 @@ name: "lowrisc:prim:primgen:0.1"
 
 generators:
   primgen:
-    interpreter: /nix/store/v6zfj35nbc6964nbgg73355adpnmy78s-python3-3.10.4-env/bin/python3
+    interpreter: python3
     command: util/primgen.py
