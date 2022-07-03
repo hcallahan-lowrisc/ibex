@@ -53,7 +53,7 @@
       };
 
       my_build_inputs =
-        (with pkgs; [ libelf srecord verilator riscv-isa-sim ]) ++
+        (with pkgs; [ pkg-config libelf srecord verilator riscv-isa-sim ]) ++
         [ lowrisc_riscv_gcc_toolchain my_python_env ];
 
       ibex_ss = pkgs.stdenv.mkDerivation {
