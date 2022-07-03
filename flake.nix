@@ -21,7 +21,7 @@
     let
       system = "x86_64-linux";
 
-      riscv_gcc_toolchain = pkgs.callPackage ./nix/riscv_gcc_lowrisc.nix {};
+      lowrisc_riscv_gcc_toolchain = pkgs.callPackage ./nix/riscv_gcc_lowrisc.nix {};
 
       # The upstream nixpkgs.verilator does not include zlib as a run-time dependency
       # It is needed in some use-cases (eg. FST) when building against verilator headers
@@ -53,8 +53,27 @@
       };
 
       my_build_inputs =
-        (with pkgs; [ libelf srecord verilator ]) ++
-        [ riscv_gcc_toolchain my_python_env ];
+        (with pkgs; [ libelf srecord verilator riscv-isa-sim ]) ++
+        [ lowrisc_riscv_gcc_toolchain my_python_env ];
+
+      ibex_ss = pkgs.stdenv.mkDerivation {
+        pname = "simple_system";
+        name = "ss";
+        version = "0.1.0";
+        src = pkgs.lib.cleanSource ./.;
+        packages = my_build_inputs;
+
+        prePatch = ''
+          substituteInPlace vendor/lowrisc_ip/dv/tools/ralgen/ralgen.core \
+            --replace 'python3' ${my_python_env}/bin/python3
+          substituteInPlace vendor/lowrisc_ip/ip/prim/primgen.core \
+            --replace 'python3' ${my_python_env}/bin/python3
+        '';
+        installPhase = ''
+          mkdir -p $out
+          cp -r * $out
+          '';
+        };
 
       # requirements_ibex = ''
       #     ##IBEX##
@@ -93,18 +112,7 @@
 
     in
       {
-        packages.x86_64-linux.default = pkgs.stdenv.mkDerivation {
-          pname = "simple_system";
-          name = "ss";
-          version = "0.1.0";
-          src = pkgs.lib.cleanSource ./.;
-          packages = my_build_inputs;
-
-          installPhase = ''
-          mkdir -p $out
-          cp -r * $out
-          '';
-        };
+        packages.x86_64-linux.default = ibex_ss;
 
         packages.x86_64-linux.dockerImage = pkgs.dockerTools.buildImage {
           name = "simple_system_docker";
@@ -120,8 +128,13 @@
           pname = "simple_system";
           name = "ss";
           version = "0.1.0";
-          src = pkgs.lib.cleanSource ./.;
-          packages = my_build_inputs;
+          shellHook = ''
+            substituteInPlace vendor/lowrisc_ip/dv/tools/ralgen/ralgen.core \
+              --replace 'python3' ${my_python_env}/bin/python3
+            substituteInPlace vendor/lowrisc_ip/ip/prim/primgen.core \
+              --replace 'python3' ${my_python_env}/bin/python3
+          '';
+          packages = [ my_build_inputs ];
         };
 
         # Construct a devShell with all of our dependencies (numtide/devshell)
