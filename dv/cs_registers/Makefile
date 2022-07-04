@@ -23,7 +23,7 @@ LDFLAGS  = -shared
 CC       = $(CXX)
 
 # Add svdpi include
-TOOLDIR = $(subst bin/$(TOOL),,$(shell which $(TOOL)))
+TOOLDIR = $(subst bin/$(TOOL),,$(shell command -v $(TOOL)))
 ifeq ($(TOOL),vcs)
   INCLUDES += -I$(TOOLDIR)include
 else
