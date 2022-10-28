@@ -165,6 +165,9 @@ bool SpikeCosim::step(uint32_t write_reg, uint32_t write_reg_data,
                       bool sync_trap) {
   assert(write_reg < 32);
 
+  FILE *log_file;
+  log_file = log->get();
+
   // The DUT has just produced an RVFI item
   // (parameters of this func is the data in the RVFI item).
 
@@ -213,6 +216,8 @@ bool SpikeCosim::step(uint32_t write_reg, uint32_t write_reg_data,
     if (!(processor->get_state()->mcause->read() & 0x80000000) ||
         processor->get_state()->debug_mode) { // (Async-Traps are disabled in debug mode)
       // Spike encountered a synchronous trap
+
+      fprintf(log_file, "Spike : synchronous trap\n");
       pending_sync_exception = true;
 
     } else {
@@ -222,10 +227,14 @@ bool SpikeCosim::step(uint32_t write_reg, uint32_t write_reg_data,
       initial_spike_pc = (processor->get_state()->pc & 0xffffffff);
       processor->step(1);
 
+      fprintf(log_file, "Spike : asynchronous trap\n");
+
       if (processor->get_state()->last_inst_pc == PC_INVALID) {
         // If we see PC_INVALID here, the first instr of the ISR must cause an
         // exception, as interrupts are now disabled.
         pending_sync_exception = true;
+
+        fprintf(log_file, "Spike : sync trap after stepping on async trap! \n");
       }
     }
 

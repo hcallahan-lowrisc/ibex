@@ -64,6 +64,7 @@ class ibex_cosim_scoreboard extends uvm_scoreboard;
     cleanup_cosim();
 
     // TODO: Ensure log file on reset gets append rather than overwrite?
+    `uvm_info(`gfn, "Initializing spike now!", UVM_LOW);
     cosim_handle = spike_cosim_init(cfg.isa_string, cfg.start_pc, cfg.start_mtvec, cfg.log_file,
       cfg.pmp_num_regions, cfg.pmp_granularity, cfg.mhpm_counter_num, cfg.secure_ibex, cfg.icache);
 
@@ -131,7 +132,14 @@ class ibex_cosim_scoreboard extends uvm_scoreboard;
         riscv_cosim_set_csr(cosim_handle, CSR_MHPMCOUNTER3H + i, rvfi_instr.mhpmcountersh[i]);
       end
 
-      riscv_cosim_set_ic_scr_key_valid(cosim_handle, rvfi_instr.ic_scr_key_valid);
+      `uvm_info(`gfn,
+                // $sformatf("rvfi valid, stepping cosim : addr=0x%08x wdata=0x%08x pc=0x%08x trap=%s \n %s",
+                $sformatf("rvfi valid, stepping cosim : addr=0x%08x wdata=0x%08x pc=0x%08x trap=%s",
+                          rvfi_instr.rd_addr,
+                          rvfi_instr.rd_wdata,
+                          rvfi_instr.pc,
+                          (rvfi_instr.trap == 1'b0) ? "False" : "True"),
+                UVM_LOW);
 
       if (!riscv_cosim_step(cosim_handle, rvfi_instr.rd_addr, rvfi_instr.rd_wdata, rvfi_instr.pc,
                             rvfi_instr.trap)) begin

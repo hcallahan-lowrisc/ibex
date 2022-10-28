@@ -48,7 +48,7 @@ class ibex_rvfi_monitor extends uvm_monitor;
       end
 
       `uvm_info(get_full_name(), $sformatf("Seen instruction:\n%s", trans_collected.sprint()),
-        UVM_HIGH)
+        UVM_LOW)
 
       item_collected_port.write(trans_collected);
 
