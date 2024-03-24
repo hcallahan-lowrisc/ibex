@@ -60,8 +60,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Ibex Documentation'
-copyright = '2017-2018, ETH Zurich and University of Bologna, 2018-present lowRISC'
-author = 'lowRISC contributors'
+copyright = '2017-2018: ETH Zurich and University of Bologna. 2018-present: lowRISC.'
+author = 'lowRISC Contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

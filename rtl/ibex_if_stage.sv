@@ -72,8 +72,8 @@ module ibex_if_stage import ibex_pkg::*; #(
                                                                 // is a compressed instr
   output logic                        instr_bp_taken_o,         // instruction was predicted to be
                                                                 // a taken branch
-  output logic                        instr_fetch_err_o,        // bus error on fetch
-  output logic                        instr_fetch_err_plus2_o,  // bus error misaligned
+  output logic                        instr_fetch_err_o,        // bus | pmp error on fetch
+  output logic                        instr_fetch_err_plus2_o,  // bus | pmp error misaligned
   output logic                        illegal_c_insn_id_o,      // compressed decoder thinks this
                                                                 // is an invalid instr
   output logic                        dummy_instr_id_o,         // Instruction is a dummy

@@ -1,3 +1,5 @@
+# Python requirements for building the documentation using sphinx
+
 setuptools_scm
 sphinx>=7.0
 sphinx_rtd_theme

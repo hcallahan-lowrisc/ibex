@@ -118,8 +118,7 @@ compile_riscvdv_tests: $(riscvdv-test-bins)
 $(riscvdv-test-bins): $(TESTS-DIR)/%/test.bin: \
   $(TESTS-DIR)/%/test.S scripts/compile_test.py
 	@echo Compiling riscvdv test assembly to create binary at $@
-	$(verb)env PYTHONPATH=$(PYTHONPATH) \
-	scripts/compile_test.py \
+	$(verb)scripts/compile_test.py \
 	  --dir-metadata $(METADATA-DIR) \
 	  --test-dot-seed $*
 
@@ -127,8 +126,7 @@ $(riscvdv-test-bins): $(TESTS-DIR)/%/test.bin: \
 compile_directed_tests: $(directed-test-bins)
 $(directed-test-bins): scripts/compile_test.py
 	@echo Compiling directed test to create binary at $@
-	$(verb)env PYTHONPATH=$(PYTHONPATH) \
-	scripts/compile_test.py \
+	$(verb)scripts/compile_test.py \
 	  --dir-metadata $(METADATA-DIR) \
 	  --test-dot-seed $(shell basename $(dir $@))
 

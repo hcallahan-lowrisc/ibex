@@ -34,8 +34,7 @@ $(CORE-CONFIG-STAMP): \
   scripts/render_config_template.py \
   | $(BUILD-DIR)
 	@echo Generating core configuration file
-	$(verb)env PYTHONPATH=$(PYTHONPATH) \
-	  scripts/render_config_template.py \
+	$(verb)scripts/render_config_template.py \
 	    --dir-metadata $(METADATA-DIR) \
 	    $(EXT_DIR)/riscv_core_setting.tpl.sv > $(EXT_DIR)/riscv_core_setting.sv
 	$(call dump-vars,$(core-config-vars-path),gen,$(core-config-var-deps))
@@ -58,8 +57,7 @@ $(METADATA-DIR)/instr.gen.build.stamp: \
   scripts/build_instr_gen.py \
   | $(BUILD-DIR)
 	@echo Building randomized test generator
-	$(verb)env PYTHONPATH=$(PYTHONPATH) \
-	  scripts/build_instr_gen.py \
+	$(verb)scripts/build_instr_gen.py \
 	    --dir-metadata $(METADATA-DIR)
 	$(call dump-vars,$(ig-build-vars-path),gen,$(instr-gen-build-var-deps))
 	@touch $@
@@ -77,8 +75,7 @@ $(METADATA-DIR)/instr.gen.build.stamp: \
 $(riscvdv-test-asms): $(TESTS-DIR)/%/$(asm-stem): \
   $(INSTR-GEN-BUILD-STAMP) $(TESTLIST) scripts/run_instr_gen.py
 	@echo Running randomized test generator to create assembly file $@
-	$(verb)env PYTHONPATH=$(PYTHONPATH) \
-	scripts/run_instr_gen.py \
+	$(verb)scripts/run_instr_gen.py \
 	  --dir-metadata $(METADATA-DIR) \
 	  --test-dot-seed $*
 
