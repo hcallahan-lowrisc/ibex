@@ -9,11 +9,6 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
 
-    poetry2nix = {
-      url = "github:nix-community/poetry2nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
-    };
     mkshell-minimal.url = "github:viperML/mkshell-minimal";
 
     # The input 'lowrisc-nix' contains some common dependencies that can be used
@@ -198,17 +193,7 @@
         # - Using the fusesoc .core files in this repo requires a lowrisc-fork of fusesoc, so this
         #   file specifies the forked repository. Most other python package dependencies are in
         #   support of fusesoc.
-        formal_python_env = let
-          poetry2nix = inputs.poetry2nix.lib.mkPoetry2Nix {inherit pkgs;};
-          lowriscPoetryOverrides = inputs.lowrisc-nix.lib.poetryOverrides {inherit pkgs;};
-        in
-          poetry2nix.mkPoetryEnv {
-            projectDir = ./dv/formal;
-            overrides = [
-              poetry2nix.defaultPoetryOverrides
-              lowriscPoetryOverrides
-            ];
-          };
+        formal_python_env = pkgs.callPackage ./dv/formal {inherit inputs;};
 
         formal_shell = mkshell-minimal {
           packages = [
