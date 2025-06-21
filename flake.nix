@@ -17,7 +17,7 @@
 
     # Deps for the dv/formal flow
     psgen = {
-      url = "github:mndstrmr/psgen";
+      url = "/home/harry/projects/psgen";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };

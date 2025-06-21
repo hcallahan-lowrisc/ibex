@@ -48,11 +48,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1717050755,
-        "narHash": "sha256-C9IEHABulv2zEDFA+Bf0E1nmfN4y6MIUe5eM2RCrDC0=",
+        "lastModified": 1750314194,
+        "narHash": "sha256-SjpXWEeB+UIMzuCAF94PuyAXpJdnBLF45JvI6o4wKIU=",
         "owner": "tweag",
         "repo": "gomod2nix",
-        "rev": "31b6d2e40b36456e792cd6cf50d5a8ddd2fa59a1",
+        "rev": "a5f75f563748599d448a4a076816041d7b0fc07e",
         "type": "github"
       },
       "original": {
@@ -256,17 +256,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1723038779,
-        "narHash": "sha256-L/toJC6lyeVJy2Uswse8aCrhdt0mTxDfn8t0NpNVn/I=",
-        "owner": "mndstrmr",
-        "repo": "psgen",
-        "rev": "2d0c1e0690cf6c3b9b1bf4f51bccab4698f4e21f",
-        "type": "github"
+        "lastModified": 1750543132,
+        "narHash": "sha256-l2PR6M2OewEoHz5c+uVPFVQ9q6zTJFpi4MyTvkbR5S0=",
+        "ref": "refs/heads/bump_go_1_24_3",
+        "rev": "3595961e775de1c0df9829d77caa1c579b208179",
+        "revCount": 37,
+        "type": "git",
+        "url": "file:///home/harry/projects/psgen"
       },
       "original": {
-        "owner": "mndstrmr",
-        "repo": "psgen",
-        "type": "github"
+        "type": "git",
+        "url": "file:///home/harry/projects/psgen"
       }
     },
     "pyproject-build-systems": {
