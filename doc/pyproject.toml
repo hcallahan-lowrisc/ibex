@@ -1,0 +1,17 @@
+[project]
+name = "doc"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "jinja2==3.0.3",
+    "setuptools-scm>=8.2.0",
+    "sphinx>=7.0",
+    "sphinx-rtd-theme>=3.0.2",
+    "sphinxcontrib-wavedrom>=3.0.4",
+    "wavedrom>=1.9.0rc1",
+]
+
+[dependency-groups]
+dev = [
+    "sphinx-autobuild>=2024.10.3",
+]
