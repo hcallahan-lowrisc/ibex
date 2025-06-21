@@ -82,6 +82,26 @@
         "type": "github"
       }
     },
+    "lowrisc-nix-private": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1744886009,
+        "narHash": "sha256-daNIb1m/+E7z8Pl3DrqQ5pKh/FIXi4+4e2erLoVSvsI=",
+        "ref": "refs/heads/main",
+        "rev": "0a7fa02ff7677d502b20e142c35ea56ccbab4fe4",
+        "revCount": 5,
+        "type": "git",
+        "url": "ssh://git@github.com/lowRISC/lowrisc-nix-private.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/lowRISC/lowrisc-nix-private.git"
+      }
+    },
     "lowrisc_sail": {
       "flake": false,
       "locked": {
@@ -317,6 +337,7 @@
       "inputs": {
         "flake-utils": "flake-utils",
         "lowrisc-nix": "lowrisc-nix",
+        "lowrisc-nix-private": "lowrisc-nix-private",
         "lowrisc_sail": "lowrisc_sail",
         "lowrisc_sail_riscv": "lowrisc_sail_riscv",
         "mkshell-minimal": "mkshell-minimal",

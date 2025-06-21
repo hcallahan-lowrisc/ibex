@@ -30,6 +30,13 @@
       flake = false;
     };
 
+    # The input 'lowrisc-nix-private' is access-controlled.
+    # Outputs which depend on this input are for internal use only, and will fail
+    # to evaluate without the appropriate credentials.
+    # All outputs which depend on this input are suffixed '_lowrisc'
+    lowrisc-nix-private.url = "git+ssh://git@github.com/lowRISC/lowrisc-nix-private.git";
+    lowrisc-nix-private.inputs.nixpkgs.follows = "nixpkgs";
+
     pyproject-nix.url = "github:pyproject-nix/pyproject.nix";
     pyproject-build-systems = {
       url = "github:pyproject-nix/build-system-pkgs";
@@ -78,6 +85,13 @@
           };
         };
         inherit (pkgs) lib;
+
+        # This import creates internal-use only outputs, which build on
+        # input attributes that cannot be fetched without appropriate credentials.
+        lr = import ./nix/lowrisc.nix {
+          inherit inputs pkgs system;
+          extraDependencies = sim_shared_lib_deps;
+        };
 
         mkshell-minimal = inputs.mkshell-minimal pkgs;
 
@@ -264,7 +278,7 @@
             inherit eda_shell;
             inherit doc_shell;
             inherit formal_shell formal_dev_shell;
-          };
+          } // lr.devShells;
         }
     );
 }
