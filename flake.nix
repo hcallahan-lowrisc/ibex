@@ -86,6 +86,8 @@
 
         mkshell-minimal = inputs.mkshell-minimal pkgs;
 
+        mkApp = pkg: { type = "app"; program = pkgs.lib.getExe pkg; };
+
         ################
         # DEPENDENCIES #
         ################
@@ -147,6 +149,7 @@
           src = inputs.lowrisc_sail_riscv;
         }).src;
 
+        ibex_doc = import ./nix/doc.nix {inherit inputs pkgs;};
 
         ################
         # ENVIRONMENTS #
@@ -252,16 +255,29 @@
           '';
         });
 
+        doc_shell = pkgs.mkShellNoCC {
+          name = "ibex-docShell";
+          packages = [
+            ibex_doc.virtualenv-dev
+          ];
+        };
+
         in {
           packages = {
             # Export the package for the lowrisc fork of the sail compiler. This allows us
             # to re-use its build environment when using the .#formal-dev flow.
             inherit lowrisc_sail;
+            docs_site = ibex_doc.site;
+          };
+          apps = {
+            docs_site_serve = mkApp ibex_doc.serve;
+            docs_site_autobuild = mkApp ibex_doc.autobuild;
           };
           devShells = rec {
             inherit shell;
             inherit syn_shell;
             inherit eda_shell;
+            inherit doc_shell;
             inherit formal_shell formal_dev_shell;
           };
         }
