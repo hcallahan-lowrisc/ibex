@@ -207,6 +207,51 @@
             ];
           };
 
+        formal_shell = mkshell-minimal {
+          packages = [
+            inputs.psgen.packages.${system}.default
+            lowrisc_sail
+            formal_python_env
+          ] ++ (with pkgs; [
+            gnumake
+            patch
+          ]);
+          shellHook = let
+            # The formal environment has an untracked external requirement on Cadence Jasper.
+            # Add a check here which will prevent launching the devShell if Jasper is not found on the user's path.
+            # TODO: Is this robust? Do we want to check available features?
+            check_jg = ''
+              if ! command -v jg &>/dev/null; then
+                echo "Jasper not found on path. Not launching devShell."
+                exit 1
+              fi
+            '';
+          in ''
+            ${check_jg}
+            # The following environment variables are used by the formal build scripts to pick up the locations
+            # of the external source-file dependencies.
+            # The can be re-exported manually for development (see .#formal-dev)
+            export LOWRISC_SAIL_SRC=${lowrisc_sail.src}
+            export LOWRISC_SAIL_RISCV_SRC=${lowrisc_sail_riscv.src}
+          '';
+        };
+
+        formal_dev_shell = formal_shell.overrideAttrs (prev: {
+          shellHook = prev.shellHook + ''
+            cat << EOF
+            ========================================================================================
+            This is the development shell. By default it is identical to the .#formal shell.
+            In order to use dev dependencies (e.g. psgen or Sail), prepend the new binaries to PATH:
+              export PATH=<bindir>:\$PATH
+            If developing the Sail sources, also update LOWRISC_SAIL_SRC:
+              export LOWRISC_SAIL_SRC=<dirname>
+            To use a local version of Ibex's sail-riscv model, also update LOWRISC_SAIL_RISCV_SRC:
+              export LOWRISC_SAIL_RISCV_SRC=<dirname>
+            ========================================================================================
+            EOF
+          '';
+        });
+
         in {
           packages = {
             # Export the package for the lowrisc fork of the sail compiler. This allows us
@@ -217,50 +262,7 @@
             inherit shell;
             inherit syn_shell;
             inherit eda_shell;
-            formal = mkshell-minimal {
-              packages = [
-                inputs.psgen.packages.${system}.default
-                lowrisc_sail
-                formal_python_env
-              ] ++ (with pkgs; [
-                gnumake
-                patch
-              ]);
-              shellHook = let
-                # The formal environment has an untracked external requirement on Cadence Jasper.
-                # Add a check here which will prevent launching the devShell if Jasper is not found on the user's path.
-                # TODO: Is this robust? Do we want to check available features?
-                check_jg = ''
-                  if ! command -v jg &>/dev/null; then
-                    echo "Jasper not found on path. Not launching devShell."
-                    exit 1
-                  fi
-                '';
-              in ''
-                ${check_jg}
-                # The following environment variables are used by the formal build scripts to pick up the locations
-                # of the external source-file dependencies.
-                # The can be re-exported manually for development (see .#formal-dev)
-                export LOWRISC_SAIL_SRC=${lowrisc_sail.src}
-                export LOWRISC_SAIL_RISCV_SRC=${lowrisc_sail_riscv.src}
-              '';
-            };
-
-            formal-dev = formal.overrideAttrs (prev: {
-              shellHook = prev.shellHook + ''
-                cat << EOF
-                ========================================================================================
-                This is the development shell. By default it is identical to the .#formal shell.
-                In order to use dev dependencies (e.g. psgen or Sail), prepend the new binaries to PATH:
-                  export PATH=<bindir>:\$PATH
-                If developing the Sail sources, also update LOWRISC_SAIL_SRC:
-                  export LOWRISC_SAIL_SRC=<dirname>
-                To use a local version of Ibex's sail-riscv model, also update LOWRISC_SAIL_RISCV_SRC:
-                  export LOWRISC_SAIL_RISCV_SRC=<dirname>
-                ========================================================================================
-                EOF
-              '';
-            });
+            inherit formal_shell formal_dev_shell;
           };
         }
     );
