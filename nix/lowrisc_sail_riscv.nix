@@ -8,7 +8,7 @@
   src,
 }:
 
-pkgs.sail-riscv-rv32.overrideAttrs {
+pkgs.sail-riscv.overrideAttrs {
   pname = "lowrisc_sail_riscv";
   inherit src;
 
