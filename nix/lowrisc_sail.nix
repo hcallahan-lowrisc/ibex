@@ -8,16 +8,14 @@
   src,
 }:
 
-pkgs.ocamlPackages.sail.overrideAttrs (prev: {
+pkgs.ocaml-ng.ocamlPackages_5_1.sail.overrideAttrs (prev: {
   pname = "lowrisc_sail";
   inherit src;
 
   # The lowRISC fork is older than upstream, and requires additional dependencies
   # from those specified upsteam to build. Add them here.
   propagatedBuildInputs =
-    prev.propagatedBuildInputs ++ (with pkgs.ocamlPackages; [
-      menhirLib
-    ]) ++ (with pkgs; [
+    prev.propagatedBuildInputs ++ (with pkgs; [
       z3
     ]);
 })

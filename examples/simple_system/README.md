@@ -1,7 +1,7 @@
 # Ibex Simple System
 
-Simple System gives you an Ibex based system simulated by Verilator that can
-run stand-alone binaries. It contains:
+Simple System gives you an Ibex based system simulated by Verilator that can run stand-alone binaries.
+It contains:
 
 * An Ibex Core
 * A single memory for instructions and data
@@ -12,11 +12,10 @@ run stand-alone binaries. It contains:
 ## Prerequisites
 
 * [Verilator](https://www.veripool.org/verilator/)
-  Note Linux package managers may have Verilator but often a very old version
-  that is not suitable. It is recommended Verilator is built from source.
+  Note Linux package managers may have Verilator but often a very old version that is not suitable.
+  It is recommended Verilator is built from source.
 * The Python dependencies of this repository.
-  Install them with `pip3 install -U -r python-requirements.txt` from the
-  repository root.
+  Install them with `pip3 install -U -r python-requirements.txt` from the repository root.
 * RISC-V Compiler Toolchain - lowRISC provides a pre-built GCC based toolchain
   <https://github.com/lowRISC/lowrisc-toolchains/releases>
 * libelf and its development libraries.
@@ -27,9 +26,9 @@ run stand-alone binaries. It contains:
 
 ## Building Simulation
 
-The Simple System simulator binary can be built via FuseSoC. This can be built
-with different configurations of Ibex, specified by parameters. To build the
-"small" configuration, run the following command from the Ibex repository root.
+The Simple System simulator binary can be built via FuseSoC.
+This can be buil  with different configurations of Ibex, specified by parameters.
+To build the "small" configuration, run the following command from the Ibex repository root.
 
 
 ```
@@ -37,9 +36,8 @@ fusesoc --cores-root=. run --target=sim --setup --build \
         lowrisc:ibex:ibex_simple_system $(util/ibex_config.py small fusesoc_opts)
 ```
 
-To see performance counters other than the total number of instructions
-executed, you will need to ask for a larger configuration. One possible example
-comes from replacing `small` in the command above with `opentitan`.
+To see performance counters other than the total number of instructions executed, you will need to ask for a larger configuration.
+One possible example comes from replacing `small` in the command above with `opentitan`.
 
 ## Building Software
 
@@ -51,16 +49,13 @@ To build the hello world example, from the Ibex repository root run:
 make -C examples/sw/simple_system/hello_test
 ```
 
-The compiled program is available at
-`examples/sw/simple_system/hello_test/hello_test.elf`. The same directory also
-contains a Verilog memory file (vmem file) to be used with some simulators.
+The compiled program is available at `examples/sw/simple_system/hello_test/hello_test.elf`.
+The same directory also contains a Verilog memory file (vmem file) to be used with some simulators.
 
 To build new software make a copy of the `hello_test` directory named as desired.
 Look inside the Makefile for further instructions.
 
-If using a toolchain other than the lowRISC pre-built one
-`examples/sw/simple_system/common/common.mk` may need altering to point to the
-correct compiler binaries.
+If using a toolchain other than the lowRISC pre-built one `examples/sw/simple_system/common/common.mk` may need altering to point to the correct compiler binaries.
 
 ## Running the Simulator
 
@@ -70,22 +65,17 @@ Having built the simulator and software, from the Ibex repository root run:
 ./build/lowrisc_ibex_ibex_simple_system_0/sim-verilator/Vibex_simple_system [-t] --meminit=ram,<sw_elf_file>
 ```
 
-`<sw_elf_file>` should be a path to an ELF file  (or alternatively a vmem file)
-built as described above. Use
-`./examples/sw/simple_system/hello_test/hello_test.elf` to run the `hello_test`
-binary.
+`<sw_elf_file>` should be a path to an ELF file  (or alternatively a vmem file) built as described above.
+Use `./examples/sw/simple_system/hello_test/hello_test.elf` to run the `hello_test` binary.
 
 Pass `-t` to get an FST/VCD trace of execution that can be viewed with
 [GTKWave](http://gtkwave.sourceforge.net/).
 
 By default a FST file is created in your current directory.
 
-To produce a VCD file, remove the Verilator flags `--trace-fst` and
-`-DVM_TRACE_FMT_FST` in ibex_simple_system.core before building the simulator
-binary.
+To produce a VCD file, remove the Verilator flags `--trace-fst` and `-DVM_TRACE_FMT_FST` in ibex_simple_system.core before building the simulator binary.
 
-If using the `hello_test` binary the simulator will halt itself, outputting some
-simulation statistics:
+If using the `hello_test` binary the simulator will halt itself, outputting some simulation statistics:
 
 ```
 Simulation statistics
@@ -123,9 +113,7 @@ Similar to the Verilator flow the Simple System simulator binary can be built us
 fusesoc --cores-root=. run --target=sim --tool=vcs --setup --build lowrisc:ibex:ibex_simple_system --RV32E=0 --RV32M=ibex_pkg::RV32MFast --SRAMInitFile=`<sw_vmem_file>`
 ```
 
-`<sw_vmem_file>` should be a path to a vmem file built as described above, use
-`./examples/sw/simple_system/hello_test/hello_test.vmem` to run the `hello_test`
-binary.
+`<sw_vmem_file>` should be a path to a vmem file built as described above, use `./examples/sw/simple_system/hello_test/hello_test.vmem` to run the `hello_test` binary.
 
 To run the simulator:
 
@@ -143,9 +131,7 @@ To build and run Simple System run:
 fusesoc --cores-root=. run --target=sim --tool=rivierapro lowrisc:ibex:ibex_simple_system --RV32E=0 --RV32M=ibex_pkg::RV32MFast --SRAMInitFile=\"$(readlink -f <sw_vmem_file>)\"
 ```
 
-`<sw_vmem_file>` should be a path to a vmem file built as described above, use
-`./examples/sw/simple_system/hello_test/hello_test.vmem` to run the `hello_test`
-binary.
+`<sw_vmem_file>` should be a path to a vmem file built as described above, use `./examples/sw/simple_system/hello_test/hello_test.vmem` to run the `hello_test` binary.
 
 ## System Memory Map
 

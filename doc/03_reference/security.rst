@@ -91,7 +91,7 @@ This can be useful to detect fault injection attacks.
 No attempt is made to correct detected errors, but an internal major alert is signaled for the system to take action.
 
 Register file read addresses glitch detection
--------------------------------------------
+---------------------------------------------
 
 When Ibex is configured with the SecureIbex parameter, the read addresses provided to the register file are converted to one-hot encoded signals, and a one-hot encoded MUX is used to select the register to read from.
 By using one-hot encoding checkers, glitches in the one-hot encoded signals are detected.

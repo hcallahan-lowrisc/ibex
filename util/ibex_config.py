@@ -8,10 +8,13 @@ import argparse
 import os
 import shlex
 import sys
+import pathlib3x as pathlib
+import textwrap
 
 import yaml
 
-_DEFAULT_CONFIG_FILE = 'ibex_configs.yaml'
+# The default Ibex configurations ('ibex_configs.yaml' in the repository root).
+_DEFAULT_CONFIG_FILE = pathlib.Path(__file__).parents[1] / pathlib.Path('ibex_configs.yaml')
 
 
 class ConfigException(Exception):
@@ -19,12 +22,25 @@ class ConfigException(Exception):
 
 
 class Config:
-    '''An object representing an Ibex configuration'''
+    """An object representing a single Ibex configuration."""
+
+    # The following items represent the 'ibex_top' parameters which may be used
+    # to instantiate different architectural variations of the Ibex CPU.
+    # (There are additional parameters, which do not change the Ibex architecture)
+    #
+    # The second item in each tuple corresponds to the type of the parameter. The
+    # downstream tooling may ingest the parameterized values in different ways
+    # depending on their types.
+    # Due to some tooling limitations, parameters which are strings or enumerations
+    # are passed on the command line using compile-time preprocessor define sytanx,
+    # used for textual macro expansions (e.g. `IBEX_CFG_RV32M).
+    # Paramters which are bools or integers can be set via the appropriate command
+    # line syntax for elaboration-time overrides.
     known_fields = [
         ('RV32E', bool),
-        ('RV32M', str),
-        ('RV32B', str),
-        ('RegFile', str),
+        ('RV32M', str), # ibex_pkg::rv32m_e
+        ('RV32B', str), # ibex_pkg::rv32b_e
+        ('RegFile', str), # ibex_pkg::regfile_e
         ('BranchTargetALU', bool),
         ('WritebackStage', bool),
         ('ICache', bool),
@@ -40,9 +56,11 @@ class Config:
         ('MHPMCounterWidth', int)
     ]
 
-    def __init__(self, yml):
+    def __init__(self, yml: dict):
         if not isinstance(yml, dict):
             raise ValueError('Configuration object is not a dict')
+
+        self.params = yml
 
         yaml_keys = set(yml.keys())
         known_keys = {fld for (fld, typ) in Config.known_fields}
@@ -57,56 +75,59 @@ class Config:
             raise ValueError(f'Configuration object has '
                              f'missing keys: {extra_keys}')
 
-        self.params = yml
+        self.rv32e = self.read_bool('RV32E')
+        self.rv32m = self.read_str('RV32M')
+        self.rv32b = self.read_str('RV32B')
+        self.reg_file = self.read_str('RegFile')
+        self.branch_target_alu = self.read_bool('BranchTargetALU')
+        self.writeback_stage = self.read_bool('WritebackStage')
+        self.icache = self.read_bool('ICache')
+        self.icache_ecc = self.read_bool('ICacheECC')
+        self.icache_scramble = self.read_bool('ICacheScramble')
+        self.branch_predictor = self.read_bool('BranchPredictor')
+        self.dbg_trigger_en = self.read_bool('DbgTriggerEn')
+        self.secure_ibex = self.read_bool('SecureIbex')
+        self.pmp_enable = self.read_bool('PMPEnable')
+        self.pmp_granularity = self.read_int('PMPGranularity')
+        self.pmp_num_regions = self.read_int('PMPNumRegions')
+        self.mhpm_counter_num = self.read_int('MHPMCounterNum')
+        self.mhpm_counter_width = self.read_int('MHPMCounterWidth')
 
-        self.rv32e = Config.read_bool('RV32E', yml)
-        self.rv32m = Config.read_str('RV32M', yml)
-        self.rv32b = Config.read_str('RV32B', yml)
-        self.reg_file = Config.read_str('RegFile', yml)
-        self.branch_target_alu = Config.read_bool('BranchTargetALU', yml)
-        self.writeback_stage = Config.read_bool('WritebackStage', yml)
-        self.icache = Config.read_bool('ICache', yml)
-        self.icache_ecc = Config.read_bool('ICacheECC', yml)
-        self.icache_scramble = Config.read_bool('ICacheScramble', yml)
-        self.branch_predictor = Config.read_bool('BranchPredictor', yml)
-        self.dbg_trigger_en = Config.read_bool('DbgTriggerEn', yml)
-        self.secure_ibex = Config.read_bool('SecureIbex', yml)
-        self.pmp_enable = Config.read_bool('PMPEnable', yml)
-        self.pmp_granularity = Config.read_int('PMPGranularity', yml)
-        self.pmp_num_regions = Config.read_int('PMPNumRegions', yml)
-        self.mhpm_counter_num = Config.read_int('MHPMCounterNum', yml)
-        self.mhpm_counter_width = Config.read_int('MHPMCounterWidth', yml)
-
-    @staticmethod
-    def read_bool(fld, yml):
-        val = yml[fld]
+    def read_bool(self, fld: bool) -> bool:
+        val = self.params[fld]
         if isinstance(val, bool):
             return val
         if isinstance(val, int):
             if 0 <= val <= 1:
                 return val != 0
-
             raise ValueError(f'{fld} value is {val}, which is out of '
                              'range for a boolean type.')
         raise ValueError(f'{fld} value is {val!r}, but we expected a bool.')
 
-    @staticmethod
-    def read_int(fld, yml):
-        val = yml[fld]
+    def read_int(self, fld: int) -> int:
+        val = self.params[fld]
         if isinstance(val, int):
             return val
         raise ValueError(f'{fld} value is {val!r}, but we expected an int.')
 
-    @staticmethod
-    def read_str(fld, yml):
-        val = yml[fld]
+    def read_str(self, fld: str) -> str:
+        val = self.params[fld]
         if isinstance(val, str):
             return val
         raise ValueError(f'{fld} value is {val!r}, but we expected a string.')
 
 
 class Configs:
-    def __init__(self, yml):
+    """An object which holds a number of Ibex configuration.
+
+    The constructor takes a dictionary, intended to be generated by parsing a
+    .yaml file. The YAML file root section should be a mapping, where each
+    key is the name of the configuration, and the value is a another mapping
+    of 'ibex_top' parameter names to values for the specific configuration.
+    See the _DEFAULT_CONFIG_FILE for a valid example.
+    """
+
+    def __init__(self, yml: dict):
         if not isinstance(yml, dict):
             raise ValueError('Configurations dictionary is not a dict')
 
@@ -127,7 +148,7 @@ class FusesocOpts:
 
     def output(self, config, args):
         fusesoc_cmd = []
-        for fld, typ in Config.known_fields:
+        for fld, _ in Config.known_fields:
             val = config.params[fld]
             fusesoc_cmd.append(shlex.quote(f'--{fld}={val}'))
 
@@ -166,17 +187,50 @@ class SimOpts:
     def setup_args(self, arg_subparser):
         output_argparser = arg_subparser.add_parser(
             self.cmd_name,
+            description = textwrap.dedent("""
+            Depending on the type of each parameter, different cli argument strings
+            can be emitted.
+            For strings, the 'define_set_fn' is used.
+            For ints and bools, the 'param_set_fn' is used.
+
+            The '--string_define_prefix' option can be used to prepend an
+            additional string to each string-type parameter before passing it to
+            the 'define_set_fn' implementation. This leading string can act as a
+            namespacing identifier for the entire set of textual macro substitutions.
+            e.g.
+            string_define_prefix = 'IBEX_CMD_'
+            define_set_fn = lambda d, v: ['-define', d + '=' + v]
+            'RV32M', 'RV32MSingleCycle' -> ['-define', 'IBEX_CMD_RV32M=RV32MSingleCycle']
+
+            The '--ins_hier_path' option can be used to add a heirarchical
+            reference to each parameter before passing it to the 'param_set_fn'
+            implementation. This allows the output commands for elaboration-time
+            overrides to resolve to an 'ibex_top' instance at a user-defined location
+            in the heirarchy.
+            (N.B The 'hierarchy_sep' for each Outputter is used to join the provided
+            ins_hier_path and the parameter name to create the final reference.
+            #TODO If the heirarchy is multiple-levels deep, the provided ins_hier_path
+            will need to already contain the seperators for all parent levels. This may
+            be different depending on the outputter, which is awkward.)
+            e.g.
+            ins_hier_path = 'core_ibex_tb_top'
+            hierarchy_sep = '.'
+            param_set_fn = lambda p, v: ['-defparam',  p + '=' + v],
+            'BranchPredictor', True -> ['-defparam', 'core_ibex_tb_top.BranchPredictor=1']
+
+            """),
+            formatter_class=argparse.RawTextHelpFormatter,
             help=('Outputs options for {0}'.format(self.description)))
 
         output_argparser.add_argument(
             '--ins_hier_path',
-            help=('Hierarchical path to the instance to set '
-                  'configuration parameters on'),
+            help=("Hierarchical path to the 'ibex_top' instance to be "
+                  "overriden by the output configuration parameters."),
             default='')
         output_argparser.add_argument(
             '--string_define_prefix',
-            help=('Prefix to add to defines that are used to '
-                  'pass string parameters'),
+            help=("Prefix to add to the name of compile-time preprocessor defines, which "
+                  "are used to pass string and enumeration type parameters."),
             default='')
         output_argparser.set_defaults(output_fn=self.output)
 
@@ -217,7 +271,7 @@ def get_config_file_location():
     return os.environ.get('IBEX_CONFIG_FILE', _DEFAULT_CONFIG_FILE)
 
 
-def parse_config(config_name, config_filename):
+def parse_config(config_name: str, config_filename: str) -> Config:
     """Parses the selected config file and returns selected config information.
 
     Arguments:

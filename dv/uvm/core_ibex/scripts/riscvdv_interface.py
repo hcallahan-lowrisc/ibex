@@ -68,7 +68,8 @@ def get_cov_cmd(md: RegressionMetadata) -> List[str]:
            '--dir', str(md.dir_run),
            '-o', str(md.dir_fcov),
            '--simulator', md.simulator,
-           '--opts', '--gen_timeout 1000',
+           '--opts',
+           '--gen_timeout', '1000',
            '--isa', md.isa_ibex,
            '--custom_target', str(md.ibex_riscvdv_customtarget)]
     if md.verbose:
@@ -85,15 +86,19 @@ def get_tool_cmds(yaml_path: pathlib.Path,
                   user_subst_options: Dict[str, Union[str, pathlib.Path]]) -> List[List[str]]:
     """Substitute options and environment variables to construct a final command.
 
-    simulator is the name of the simulator to use.
-    cmd_type is Union['compile','sim']
-    user_subst_opts is a dict[str, str] of templated variables <T> in the
-    yaml commands that are to be substituted as <T> = user_subst_opts[T]
+    Args:
+        yaml_path: the path of the riscv-dv .yaml file specifying simulator options
+        simulator: the name of the simulator to use.
+        cmd_type: Either 'compile' or 'sim', the command we are selecting.
+        user_enables: Enables if groups of tool arguments should be added into
+            the final command. E.g. Should <wave_opts> be added?
+        user_subst_opts: Values to be substitutes for any templated variables <T>.
 
-    RISCV_DV allows both compile and sim keys in the yaml to have
-    multiple commands, so return [str]
+    Returns:
+        Multiple commands for either the 'compile' or 'sim' steps are possible,
+        so return all hydrated commands as [str].
 
-    Populate the riscv-dv rtl_simulation.yaml templated parameters <T> with
+    Get the final tool commands by processing the riscv-dv .yaml file according to
     the following algorithm...
 
     (1) If the yaml key 'tool':'compile/sim' contains K:V pairs with keys other
@@ -107,54 +112,77 @@ def get_tool_cmds(yaml_path: pathlib.Path,
         in the cmd, and if it does, substitute with the environment variable of
         the same name.
 
-    enable_dict should be a dict mapping names to bools.
-    For each key, N, in enable_dict, if enable_dict[N] is False, then all
-    occurrences of <N> in cmd will be replaced with ''.
-    If enable_dict[N] is True, all occurrences of <N> in cmd will be replaced
-    with opts_dict[N].
+    Example:
 
-    If N is not a key in opts_dict, this is no problem unless cmd contains
-    <N>, in which case we throw a RuntimeError.
+    # mytools.yaml
+    '''yaml
+    - tool: vcs
+      env_var: TB_DIR
+      compile:
+        cmd:
+          - >-
+            vcs
+              -full64
+              -f <core_ibex>/ibex_dv.f
+              -o <TB_DIR>/vcs_simv
+              <wave_opts> <cosim_opts>
+        wave_opts: >-
+          -debug_access+all
+        cosim_opts: >-
+          -f <core_ibex>/ibex_dv_cosim_dpi.f
+    '''
 
-    Finally, the environment variables are substituted as described in
-    subst_env_vars and any newlines are stripped out.
+    $ export TB_DIR=scratch/mytb
+    $ python -c 'print(get_tool_cmds(
+        yaml_path="mytools.yaml",
+        simulator="vcs",
+        cmd_type="compile"
+        user_enables={wave_opts: False, cosim_opts: True},
+        user_subst_options={core_ibex: "dv/uvm/core_ibex"}
+      ))'
+    vcs -full64 -f dv/uvm/core_ibex/ibex_dv.f -o scratch/mytb/vcs_simv -f dv/uvm/core_ibex/ibex_dv_cosim_dpi.f
 
     """
-    simulator_entry = _get_yaml_for_simulator(yaml_path, simulator)
+
+    simulator_dict = read_yaml(yaml_path)
+    simulator_entry = next(filter(
+        lambda i: i.get('tool') == simulator,
+        simulator_dict))
+
+    if not simulator_entry:
+        raise RuntimeError(f"Cannot find RTL simulator '{simulator}'")
+
     cmds = []
 
     for cmd in simulator_entry[cmd_type]['cmd']:
-        assert type(cmd) == str
+        logger.debug(f"Unformatted command :\n{cmd}")
         formatted_cmd = cmd
-        logger.debug("Unformatted command :")
-        logger.debug(formatted_cmd)
 
-        # (1) #
+        # (1)
         # Get all k:v pairs which are not 'cmd'
-        # Substitute with matching parameters in the command, or if the
-        # parameter is disabled by a user_enable, remove it.
-        cmd_opts_dict = {k: (v.strip() if user_enables.get(k) else '')
-                         for k, v in simulator_entry[cmd_type].items()
-                         if k != 'cmd'}
+        # If the parameter is disabled by a user_enable, drop it.
+        cmd_opts_dict = {
+            k: (v.strip() if user_enables.get(k) else '')
+            for k, v in simulator_entry[cmd_type].items()
+            if k != 'cmd'
+        }
+        # Substitute with the matching parameters in the command
         if cmd_opts_dict != {}:
             formatted_cmd = subst_dict(formatted_cmd, cmd_opts_dict)
-        logger.debug("After #1 :")
-        logger.debug(formatted_cmd)
+        logger.debug(f"After #1 :\n{formatted_cmd}")
 
-        # (2) #
+        # (2)
         if user_subst_options != {}:
             formatted_cmd = subst_dict(formatted_cmd, user_subst_options)
-        logger.debug("After #2 :")
-        logger.debug(formatted_cmd)
+        logger.debug(f"After #2 :\n{formatted_cmd}")
 
-        # (3) #
+        # (3)
         if 'env_var' in simulator_entry.keys():
             formatted_cmd = subst_env_vars(
                 formatted_cmd,
                 [i for i in simulator_entry['env_var'].replace(' ', '').split(',')]
             )
-        logger.debug("After #3 :")
-        logger.debug(formatted_cmd)
+        logger.debug(f"After #3 :\n{formatted_cmd}")
 
         # Finally, check if we have any parameters left which were not filled.
         match = re.findall(parameter_regex, formatted_cmd)
@@ -168,23 +196,3 @@ def get_tool_cmds(yaml_path: pathlib.Path,
         cmds.append(shlex.split(formatted_cmd))
 
     return cmds
-
-
-@typechecked
-def _get_yaml_for_simulator(yaml_path: pathlib.Path, simulator: str) -> dict:
-    """Get the entry for the simulator in RTL simulation yaml.
-
-    riscv-dv specifies a yaml-schema for defining simulators and commands needed
-    for building and running testbenches.
-    The ibex build system uses this schema  with it's own unique commands, in
-    the file 'rtl_simulation.yaml'.
-    Trigger an exception if there is no match.
-    """
-    logger.info("Processing simulator setup file : %s" % yaml_path)
-    for entry in read_yaml(yaml_path):
-        if entry.get('tool') == simulator:
-            logger.debug(f"Got the following yaml for simulator '{simulator}' "
-                         f"from {str(yaml_path.resolve())} :\n{entry}")
-            return entry
-
-    raise RuntimeError("Cannot find RTL simulator {}".format(simulator))

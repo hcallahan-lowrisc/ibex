@@ -68,15 +68,22 @@ export PYTHONPATH := $(shell python3 -c 'from scripts.setup_imports import get_p
 # are extracted from this metadata, it must be query-able in the makefile 'immediate' stage.
 .PHONY: run
 run:
-	@env PYTHONPATH=$(PYTHONPATH) python3 ./scripts/metadata.py \
+	@python3 ./scripts/metadata.py \
 	  --op "create_metadata" \
 	  --dir-metadata $(METADATA-DIR) \
 	  --dir-out $(OUT-DIR) \
-	  --args-list "\
-	  SEED=$(SEED) WAVES=$(WAVES) COV=$(COV) SIMULATOR=$(SIMULATOR) \
-	  ISS=$(ISS) TEST=$(TEST) VERBOSE=$(VERBOSE) ITERATIONS=$(ITERATIONS) \
-	  SIGNATURE_ADDR=$(SIGNATURE_ADDR) IBEX_CONFIG=$(IBEX_CONFIG) \
-	  DUT_COV_RTL_PATH=$(DUT_COV_RTL_PATH)"
+	  --args-list " \
+	    SEED=$(SEED) \
+	    WAVES=$(WAVES) \
+	    COV=$(COV) \
+	    SIMULATOR=$(SIMULATOR) \
+	    ISS=$(ISS) \
+	    TEST=$(TEST) \
+	    VERBOSE=$(VERBOSE) \
+	    ITERATIONS=$(ITERATIONS) \
+	    SIGNATURE_ADDR=$(SIGNATURE_ADDR) \
+	    IBEX_CONFIG=$(IBEX_CONFIG) \
+	    DUT_COV_RTL_PATH=$(DUT_COV_RTL_PATH)"
 	@$(MAKE) --file wrapper.mk --environment-overrides --no-print-directory $(GOAL)
 
 ###############################################################################

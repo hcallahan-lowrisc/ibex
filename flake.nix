@@ -17,6 +17,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.pyproject-nix.follows = "pyproject-nix";
     };
+    uv2nix_hammer_overrides.url = "github:TyberiusPrime/uv2nix_hammer_overrides";
+    uv2nix_hammer_overrides.inputs.nixpkgs.follows = "nixpkgs";
     pyproject-build-systems = {
       url = "github:pyproject-nix/build-system-pkgs";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -31,6 +33,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
+    # The input 'lowrisc-nix-private' is access-controlled.
+    # Outputs which depend on this input are for internal use only, and will fail
+    # to evaluate without the appropriate credentials.
+    # All outputs which depend on this input are suffixed '_lowrisc'
+    lowrisc-nix-private.url = "git+ssh://git@github.com/lowRISC/lowrisc-nix-private.git";
+    lowrisc-nix-private.inputs.nixpkgs.follows = "nixpkgs";
 
     psgen = {
       url = "github:mndstrmr/psgen";
@@ -57,6 +65,12 @@
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Deps for synthesis flows
+    sv2v = {
+      url = "github:zachjs/sv2v";
+      flake = false;
+    };
   };
 
   # The lowRISC public nix-cache contains builds of nix packages used by lowRISC, primarily coming from github:lowRISC/lowrisc-nix.
@@ -78,10 +92,72 @@
       let
         pkgs = import inputs.nixpkgs {
           inherit system;
+          config = {
+            allowUnfree = true;
+            allowBroken = true; # sv2v marked as broken.
+          };
         };
         inherit (pkgs) lib;
 
+        # This import creates internal-use only outputs, which build on
+        # input attributes that cannot be fetched without appropriate credentials.
+        lr = import ./nix/lowrisc.nix {
+          inherit inputs pkgs system;
+          extraDependencies = sim_shared_lib_deps;
+        };
+
         mkshell-minimal = inputs.mkshell-minimal pkgs;
+
+        mkApp = pkg: { type = "app"; program = pkgs.lib.getExe pkg; };
+
+        ################
+        # DEPENDENCIES #
+        ################
+
+        # Python environment, as defined in ./nix/pythonEnv/pyproject.toml
+        pythonEnv = import ./nix/pythonEnv {inherit inputs pkgs;};
+
+        # lowRISC fork of Spike used as a cosimulation model for Ibex Verification
+        spike = inputs.lowrisc-nix.packages.${system}.spike-ibex-cosim;
+
+        # Currently we don't build the riscv-toolchain from src, we use a github release
+        # See https://github.com/lowRISC/lowrisc-nix/blob/main/pkgs/lowrisc-toolchain-gcc-rv32imcb.nix
+        rv32imcb_toolchain = inputs.lowrisc-nix.packages.${system}.lowrisc-toolchain-gcc-rv32imcb;
+
+        ibex_runtime_deps = with pkgs; [
+          libelf # Used in DPI code
+          zlib # Verilator run-time dep
+        ];
+
+        sim_shared_lib_deps = with pkgs; [
+          elfutils
+          openssl
+        ];
+
+        ibex_project_deps =
+          [
+            pythonEnv
+            spike
+            rv32imcb_toolchain
+          ] ++
+          sim_shared_lib_deps ++
+          (with pkgs; [
+            # Tools
+            cmake
+            pkg-config
+
+            # Applications
+            verilator
+            gtkwave
+
+            # Libraries
+            srecord
+
+            # Lints & Checking
+            mypy
+          ]);
+
+        ibex_syn = import ./nix/syn.nix {inherit inputs pkgs;};
 
         # lowRISC fork of the Sail repository. The SAIL -> SV flow is used to generate the reference model.
         lowrisc_sail = import ./nix/lowrisc_sail.nix {
@@ -187,13 +263,73 @@
           EOF
         '';
 
+        ibex_doc = import ./nix/doc.nix {inherit inputs pkgs;};
+
+        ################
+        # ENVIRONMENTS #
+        ################
+
+        # These exports are required by scripts within the Ibex DV flow.
+        ibex_profile_common = ''
+          export SPIKE_PATH=${spike}/bin
+
+          export RISCV_TOOLCHAIN=${rv32imcb_toolchain}
+          export RISCV_GCC=${rv32imcb_toolchain}/bin/riscv32-unknown-elf-gcc
+          export RISCV_OBJCOPY=${rv32imcb_toolchain}/bin/riscv32-unknown-elf-objcopy
+        '';
+
+        shell = pkgs.lib.makeOverridable pkgs.mkShell {
+          name = "ibex-devshell";
+          buildInputs = ibex_runtime_deps;
+          nativeBuildInputs = ibex_project_deps;
+          shellHook = ''
+            # Unset these environment variables provided by stdenv, as the SS makefiles will not
+            # be able to discover the riscv toolchain versions otherwise.
+            unset CC OBJCOPY OBJDUMP
+
+            ${ibex_profile_common}
+          '';
+        };
+
+        syn_shell = shell.override (prev: {
+          name = "ibex-devshell-synthesis";
+          nativeBuildInputs = prev.nativeBuildInputs ++ ibex_syn.deps;
+          shellHook = prev.shellHook + ibex_syn.profile;
+        });
+
+        # This shell uses mkShellNoCC as the stdenv CC can interfere with EDA tools.
+        eda_shell = pkgs.lib.makeOverridable pkgs.mkShellNoCC {
+          name = "ibex-devshell-eda";
+          buildInputs = ibex_runtime_deps;
+          nativeBuildInputs = ibex_project_deps;
+          shellHook = ''
+            ${ibex_profile_common}
+          '';
+        };
+
+        doc_shell = pkgs.mkShellNoCC {
+          name = "ibex-docShell";
+          packages = [
+            ibex_doc.virtualenv-dev
+          ];
+        };
+
         in {
           packages = {
             # Export the package for the lowrisc fork of the sail compiler. This allows us
             # to re-use its build environment when using the .#formal-dev flow.
             inherit lowrisc_sail;
+            docs_site = ibex_doc.site;
+          };
+          apps = {
+            docs_site_serve = mkApp ibex_doc.serve;
+            docs_site_autobuild = mkApp ibex_doc.autobuild;
           };
           devShells = rec {
+            inherit shell;
+            inherit syn_shell;
+            inherit eda_shell;
+            inherit doc_shell;
             formal = mkshell-minimal {
               packages = standard_deps;
               shellHook = check_jg + exports;
@@ -226,7 +362,7 @@
                 export LD_LIBRARY_PATH=${pkgs.stdenv.cc.cc.lib}/lib/ # for rIC3, not sure why this should be necessary though
               '';
             };
-        };
-      }
+          } // lr.devShells;
+        }
   );
 }

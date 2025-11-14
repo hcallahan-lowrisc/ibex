@@ -39,8 +39,7 @@ $(METADATA-DIR)/tb.compile.stamp: \
   scripts/compile_tb.py yaml/rtl_simulation.yaml \
   | $(BUILD-DIR)
 	@echo Building RTL testbench
-	$(verb)env PYTHONPATH=$(PYTHONPATH) \
-	scripts/compile_tb.py \
+	$(verb)scripts/compile_tb.py \
 	  --dir-metadata $(METADATA-DIR)
 	$(call dump-vars,$(tb-compile-vars-path),comp,$(rtl-tb-compile-var-deps))
 	@touch $@
@@ -51,8 +50,7 @@ $(METADATA-DIR)/tb.compile.stamp: \
 $(rtl-sim-logs): $(TESTS-DIR)/%/$(rtl-sim-logfile): \
   $(TB-COMPILE-STAMP) $(TESTS-DIR)/%/test.bin scripts/run_rtl.py
 	@echo Running RTL simulation at $(@D)
-	$(verb)env PYTHONPATH=$(PYTHONPATH) \
-	scripts/run_rtl.py \
+	$(verb)scripts/run_rtl.py \
 	  --dir-metadata $(METADATA-DIR) \
 	  --test-dot-seed $*
 
@@ -62,8 +60,7 @@ $(rtl-sim-logs): $(TESTS-DIR)/%/$(rtl-sim-logfile): \
 $(comp-results): $(TESTS-DIR)/%/trr.yaml: \
   $(TESTS-DIR)/%/$(rtl-sim-logfile) scripts/check_logs.py
 	@echo Collecting simulation results and checking logs of testcase at $@
-	$(verb)env PYTHONPATH=$(PYTHONPATH) \
-	scripts/check_logs.py \
+	$(verb)scripts/check_logs.py \
 	  --dir-metadata $(METADATA-DIR) \
 	  --test-dot-seed $*
 
@@ -80,8 +77,7 @@ $(METADATA-DIR)/fcov.stamp: $(comp-results) \
   scripts/get_fcov.py
 ifeq ($(COV), 1)
 	@echo Generating RISCV_DV functional coverage
-	$(verb)env PYTHONPATH=$(PYTHONPATH) \
-	scripts/get_fcov.py \
+	$(verb)scripts/get_fcov.py \
 	  --dir-metadata $(METADATA-DIR)
 endif
 	@touch $@
@@ -95,8 +91,7 @@ $(METADATA-DIR)/merge.cov.stamp: $(FCOV-STAMP) \
   scripts/merge_cov.py
 ifeq ($(COV), 1)
 	@echo Merging all recorded coverage data into a single report
-	$(verb)env PYTHONPATH=$(PYTHONPATH) \
-	scripts/merge_cov.py \
+	$(verb)scripts/merge_cov.py \
 	  --dir-metadata $(METADATA-DIR)
 endif
 	@touch $@
@@ -106,7 +101,6 @@ endif
 
 $(METADATA-DIR)/regr.log.stamp: scripts/collect_results.py $(comp-results) $(MERGE-COV-STAMP)
 	@echo Collecting up results of tests into report regr.log
-	$(verb)env PYTHONPATH=$(PYTHONPATH) \
-	./scripts/collect_results.py \
+	$(verb)scripts/collect_results.py \
 	  --dir-metadata $(METADATA-DIR)
 	@touch $@
